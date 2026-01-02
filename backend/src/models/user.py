@@ -7,7 +7,8 @@ import uuid
 
 class UserBase(SQLModel):
     email: str = Field(unique=True, nullable=False, max_length=255)
-    name: Optional[str] = Field(default=None, max_length=255)
+    first_name: Optional[str] = Field(default=None, max_length=100)
+    last_name: Optional[str] = Field(default=None, max_length=100)
 
 
 class User(UserBase, BaseUUIDModel, table=True):
@@ -17,9 +18,11 @@ class User(UserBase, BaseUUIDModel, table=True):
     __tablename__ = "users"
 
     email: str = Field(unique=True, nullable=False, max_length=255)
-    name: Optional[str] = Field(default=None, max_length=255)
+    first_name: Optional[str] = Field(default=None, max_length=100)
+    last_name: Optional[str] = Field(default=None, max_length=100)
     hashed_password: str = Field(nullable=False)
     is_active: bool = Field(default=True)
+    email_verified: bool = Field(default=False)
 
     # Automatically updated when the record is modified
     updated_at: datetime = Field(default_factory=datetime.utcnow)
@@ -31,14 +34,16 @@ class UserCreate(UserBase):
     """
     email: str
     password: str
-    name: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
 
 
 class UserUpdate(SQLModel):
     """
     Schema for updating an existing user
     """
-    name: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
     email: Optional[str] = None
 
 
@@ -47,9 +52,11 @@ class UserRead(UserBase):
     Schema for reading user data (without sensitive information)
     """
     id: str
-    name: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
     email: str
     is_active: bool
+    email_verified: bool
     created_at: datetime
     updated_at: datetime
 

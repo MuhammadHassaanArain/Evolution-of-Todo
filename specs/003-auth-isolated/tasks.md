@@ -30,17 +30,17 @@ Implementation of JWT-based authentication system with Better Auth integration f
 
 ## Phase 1: Setup
 
-- [ ] T001 Create backend project structure with dependencies in backend/
-- [ ] T002 Create frontend project structure with dependencies in frontend/
-- [ ] T003 Set up database connection for authentication in backend/src/database.py
-- [ ] T004 Configure environment variables for auth in backend/.env
+- [X] T001 Create backend project structure with dependencies in backend/
+- [X] T002 Create frontend project structure with dependencies in frontend/
+- [X] T003 Set up database connection for authentication in backend/src/database.py
+- [X] T004 Configure environment variables for auth in backend/.env
 
 ## Phase 2: Foundational
 
-- [ ] T005 Create JWT utility functions in backend/src/utils/jwt.py
-- [ ] T006 Implement password hashing utility in backend/src/utils/password.py
-- [ ] T007 Create authentication dependency in backend/src/api/deps.py
-- [ ] T008 Set up Better Auth client configuration in frontend/src/lib/better-auth-client.ts
+- [X] T005 Create JWT utility functions in backend/src/utils/jwt.py
+- [X] T006 Implement password hashing utility in backend/src/utils/password.py
+- [X] T007 Create authentication dependency in backend/src/api/deps.py
+- [X] T008 Set up Better Auth client configuration in frontend/src/lib/better-auth-client.ts
 
 ## Phase 3: [US1] New User Registration
 
@@ -54,16 +54,16 @@ Implementation of JWT-based authentication system with Better Auth integration f
 
 ### Implementation Tasks
 
-- [ ] T009 [P] [US1] Create User model in backend/src/models/user.py
-- [ ] T010 [P] [US1] Create authentication request/response models in backend/src/models/auth.py
-- [ ] T011 [P] [US1] Create frontend authentication types in frontend/src/types/auth.ts
-- [ ] T012 [US1] Implement AuthService for user registration in backend/src/services/auth_service.py
-- [ ] T013 [US1] Create registration endpoint in backend/src/api/auth_router.py
-- [ ] T014 [P] [US1] Create SignupForm component in frontend/src/components/auth/SignupForm.tsx
-- [ ] T015 [P] [US1] Create signup page in frontend/src/pages/signup.tsx
-- [ ] T016 [US1] Implement signup functionality in frontend/src/services/auth.ts
-- [ ] T017 [US1] Test registration flow with valid credentials
-- [ ] T018 [US1] Test registration flow with duplicate email (should fail)
+- [X] T009 [P] [US1] Create User model in backend/src/models/user.py
+- [X] T010 [P] [US1] Create authentication request/response models in backend/src/models/auth.py
+- [X] T011 [P] [US1] Create frontend authentication types in frontend/src/types/auth.ts
+- [X] T012 [US1] Implement AuthService for user registration in backend/src/services/auth_service.py
+- [X] T013 [US1] Create registration endpoint in backend/src/api/auth_router.py
+- [X] T014 [P] [US1] Create SignupForm component in frontend/src/components/auth/SignupForm.tsx
+- [X] T015 [P] [US1] Create signup page in frontend/src/pages/signup.tsx
+- [X] T016 [US1] Implement signup functionality in frontend/src/services/auth.ts
+- [X] T017 [US1] Test registration flow with valid credentials
+- [X] T018 [US1] Test registration flow with duplicate email (should fail)
 
 ## Phase 4: [US2] Existing User Login
 
@@ -77,13 +77,13 @@ Implementation of JWT-based authentication system with Better Auth integration f
 
 ### Implementation Tasks
 
-- [ ] T019 [US2] Implement user authentication in AuthService in backend/src/services/auth_service.py
-- [ ] T020 [US2] Create login endpoint in backend/src/api/auth_router.py
-- [ ] T021 [P] [US2] Create LoginForm component in frontend/src/components/auth/LoginForm.tsx
-- [ ] T022 [P] [US2] Create login page in frontend/src/pages/login.tsx
-- [ ] T023 [US2] Implement login functionality in frontend/src/services/auth.ts
-- [ ] T024 [US2] Test login flow with valid credentials
-- [ ] T025 [US2] Test login flow with invalid credentials (should fail)
+- [X] T019 [US2] Implement user authentication in AuthService in backend/src/services/auth_service.py
+- [X] T020 [US2] Create login endpoint in backend/src/api/auth_router.py
+- [X] T021 [P] [US2] Create LoginForm component in frontend/src/components/auth/LoginForm.tsx
+- [X] T022 [P] [US2] Create login page in frontend/src/pages/login.tsx
+- [X] T023 [US2] Implement login functionality in frontend/src/services/auth.ts
+- [X] T024 [US2] Test login flow with valid credentials
+- [X] T025 [US2] Test login flow with invalid credentials (should fail)
 
 ## Phase 5: [US3] Identity Verification
 
@@ -97,13 +97,13 @@ Implementation of JWT-based authentication system with Better Auth integration f
 
 ### Implementation Tasks
 
-- [ ] T026 [US3] Implement JWT validation dependency in backend/src/api/deps.py
-- [ ] T027 [US3] Create `/auth/me` endpoint in backend/src/api/auth_router.py
-- [ ] T028 [P] [US3] Create AuthContext for frontend in frontend/src/context/AuthContext.tsx
-- [ ] T029 [P] [US3] Create authentication provider wrapper in frontend/src/context/AuthContext.tsx
-- [ ] T030 [US3] Implement identity verification in frontend/src/services/auth.ts
-- [ ] T031 [US3] Test `/auth/me` endpoint with valid JWT token
-- [ ] T032 [US3] Test `/auth/me` endpoint with invalid/expired JWT token (should return 401)
+- [X] T026 [US3] Implement JWT validation dependency in backend/src/api/deps.py
+- [X] T027 [US3] Create `/auth/me` endpoint in backend/src/api/auth_router.py
+- [X] T028 [P] [US3] Create AuthContext for frontend in frontend/src/context/AuthContext.tsx
+- [X] T029 [P] [US3] Create authentication provider wrapper in frontend/src/context/AuthContext.tsx
+- [X] T030 [US3] Implement identity verification in frontend/src/services/auth.ts
+- [X] T031 [US3] Test `/auth/me` endpoint with valid JWT token
+- [X] T032 [US3] Test `/auth/me` endpoint with invalid/expired JWT token (should return 401)
 
 ## Phase 6: [US4] Session Management
 
@@ -117,17 +117,17 @@ Implementation of JWT-based authentication system with Better Auth integration f
 
 ### Implementation Tasks
 
-- [ ] T033 [US4] Create logout endpoint in backend/src/api/auth_router.py
-- [ ] T034 [P] [US4] Create LogoutButton component in frontend/src/components/auth/LogoutButton.tsx
-- [ ] T035 [US4] Implement logout functionality in frontend/src/services/auth.ts
-- [ ] T036 [US4] Implement token expiration handling in frontend
-- [ ] T037 [US4] Test logout functionality clears session properly
-- [ ] T038 [US4] Test expired token handling in frontend
-- [ ] T039 [US4] Test invalid token handling in frontend
+- [X] T033 [US4] Create logout endpoint in backend/src/api/auth_router.py
+- [X] T034 [P] [US4] Create LogoutButton component in frontend/src/components/auth/LogoutButton.tsx
+- [X] T035 [US4] Implement logout functionality in frontend/src/services/auth.ts
+- [X] T036 [US4] Implement token expiration handling in frontend
+- [X] T037 [US4] Test logout functionality clears session properly
+- [X] T038 [US4] Test expired token handling in frontend
+- [X] T039 [US4] Test invalid token handling in frontend
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 
-- [ ] T040 Add comprehensive error handling to all auth endpoints
+- [X] T040 Add comprehensive error handling to all auth endpoints
 - [ ] T041 Implement rate limiting for authentication endpoints
 - [ ] T042 Add logging for authentication events
 - [ ] T043 Create integration tests for all authentication flows

@@ -18,7 +18,7 @@ def register(user: UserCreate, session: Session = Depends(get_session)):
     Register a new user
     """
     try:
-        db_user = user_service.create_user(session, user)
+        db_user = auth_service.create_user(session, user)
         log_auth_event("registration_success", user=db_user, success=True)
         return UserRead.from_orm(db_user)
     except ValueError as e:

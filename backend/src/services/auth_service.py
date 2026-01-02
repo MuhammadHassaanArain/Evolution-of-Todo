@@ -83,6 +83,36 @@ class AuthService:
         user = session.exec(statement).first()
         return user
 
+    def create_user(self, session: Session, user_create: UserCreate) -> User:
+        """
+        Create a new user with the provided data
+        """
+        # Check if user already exists
+        statement = select(User).where(User.email == user_create.email)
+        existing_user = session.exec(statement).first()
+        if existing_user:
+            raise ValueError("Email already registered")
+
+        # Hash the password
+        hashed_password = self.get_password_hash(user_create.password)
+
+        # Create new user
+        user = User(
+            email=user_create.email,
+            first_name=user_create.first_name,
+            last_name=user_create.last_name,
+            hashed_password=hashed_password,
+            is_active=True,
+            email_verified=False
+        )
+
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+
+        log_auth_event("registration_success", user=user, success=True)
+        return user
+
 
 # Create a singleton instance of the AuthService
 auth_service = AuthService()

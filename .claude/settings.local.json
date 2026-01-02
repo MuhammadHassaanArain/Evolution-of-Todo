@@ -4,7 +4,11 @@
       "Bash(.specify/scripts/bash/setup-plan.sh --json)",
       "Bash(dir \"D:\\\\Hassaan_Work\\\\GIAIC\\\\Quarter-04\\\\Hackathons\\\\hackathon-2\\\\TODO\\\\specs\\\\003-auth-isolated\\\\contracts\")",
       "Bash(.specify/scripts/bash/check-prerequisites.sh --json)",
-      "Bash(dir \"specs\\\\003-auth-isolated\\\\checklists\" /s)"
+      "Bash(dir \"specs\\\\003-auth-isolated\\\\checklists\" /s)",
+      "Bash(dir backend frontend /s)",
+      "Bash(dir)",
+      "Bash(dir /s)",
+      "Bash(dir /b /a)"
     ]
   }
 }
