@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.specify/scripts/bash/setup-plan.sh --json)",
+      "Bash(dir \"D:\\\\Hassaan_Work\\\\GIAIC\\\\Quarter-04\\\\Hackathons\\\\hackathon-2\\\\TODO\\\\specs\\\\003-auth-isolated\\\\contracts\")"
+    ]
+  }
+}
