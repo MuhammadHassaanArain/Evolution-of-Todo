@@ -24,7 +24,9 @@
       "Bash(bash -c 'SPECIFY_FEATURE=001-frontend-routing pwd && ls -la specs/001-frontend-routing/ && .specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks')",
       "Bash(cat specs/001-frontend-routing/contracts/api-contracts.md)",
       "Bash(cat specs/001-frontend-routing/quickstart.md)",
-      "Bash(cat frontend/package.json)"
+      "Bash(cat frontend/package.json)",
+      "Bash(cat specs/001-ui-ux-polish/spec.md)",
+      "Bash(SPECIFY_FEATURE=001-ui-ux-polish bash -c '.specify/scripts/bash/check-prerequisites.sh --json')"
     ]
   }
 }
