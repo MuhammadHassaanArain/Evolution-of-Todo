@@ -40,9 +40,9 @@ description: "Task list for backend API with user ownership"
 - [X] T004 Setup JWT authentication configuration and security settings in backend/src/config/auth.py
 - [X] T005 [P] Create JWT utility functions for token creation and validation in backend/src/utils/jwt.py
 - [X] T006 [P] Setup database connection management in backend/src/database/connection.py
-- [ ] T007 Create authentication dependency for FastAPI in backend/src/api/deps.py
-- [ ] T008 Configure error handling and response formatting infrastructure in backend/src/utils/errors.py
-- [ ] T009 Setup API router and base configuration in backend/src/api/main.py
+- [X] T007 Create authentication dependency for FastAPI in backend/src/api/deps.py
+- [X] T008 Configure error handling and response formatting infrastructure in backend/src/utils/errors.py
+- [X] T009 Setup API router and base configuration in backend/src/api/main.py
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -56,13 +56,13 @@ description: "Task list for backend API with user ownership"
 
 ### Implementation for User Story 1
 
-- [ ] T010 [P] [US1] Create Todo schema models in backend/src/schemas/todo.py
-- [ ] T011 [P] [US1] Create Todo model with proper fields and relationships in backend/src/models/todo.py
-- [ ] T012 [US1] Implement Todo service for creation operations in backend/src/services/todo_service.py
-- [ ] T013 [US1] Implement POST /todos endpoint with JWT validation in backend/src/api/routers/todos.py
-- [ ] T014 [US1] Add validation logic for Todo creation in backend/src/models/todo.py
-- [ ] T015 [US1] Add ownership derivation from JWT in backend/src/api/routers/todos.py
-- [ ] T016 [US1] Implement error handling for unauthorized access in backend/src/api/routers/todos.py
+- [X] T010 [P] [US1] Create Todo schema models in backend/src/schemas/todo.py
+- [X] T011 [P] [US1] Create Todo model with proper fields and relationships in backend/src/models/todo.py
+- [X] T012 [US1] Implement Todo service for creation operations in backend/src/services/todo_service.py
+- [X] T013 [US1] Implement POST /todos endpoint with JWT validation in backend/src/api/routers/todos.py
+- [X] T014 [US1] Add validation logic for Todo creation in backend/src/models/todo.py
+- [X] T015 [US1] Add ownership derivation from JWT in backend/src/api/routers/todos.py
+- [X] T016 [US1] Implement error handling for unauthorized access in backend/src/api/routers/todos.py
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -74,12 +74,12 @@ description: "Task list for backend API with user ownership"
 
 ### Implementation for User Story 2
 
-- [ ] T017 [P] [US2] Implement GET /todos endpoint for listing user's todos in backend/src/api/routers/todos.py
-- [ ] T018 [US2] Add ownership validation for listing todos in backend/src/services/todo_service.py
-- [ ] T019 [US2] Implement GET /todos/{id} endpoint with ownership check in backend/src/api/routers/todos.py
-- [ ] T020 [US2] Add todo retrieval with ownership validation in backend/src/services/todo_service.py
-- [ ] T021 [US2] Add proper error responses for non-owned todos in backend/src/api/routers/todos.py
-- [ ] T022 [US2] Update Todo schema to match response requirements in backend/src/schemas/todo.py
+- [X] T017 [P] [US2] Implement GET /todos endpoint for listing user's todos in backend/src/api/routers/todos.py
+- [X] T018 [US2] Add ownership validation for listing todos in backend/src/services/todo_service.py
+- [X] T019 [US2] Implement GET /todos/{id} endpoint with ownership check in backend/src/api/routers/todos.py
+- [X] T020 [US2] Add todo retrieval with ownership validation in backend/src/services/todo_service.py
+- [X] T021 [US2] Add proper error responses for non-owned todos in backend/src/api/routers/todos.py
+- [X] T022 [US2] Update Todo schema to match response requirements in backend/src/schemas/todo.py
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -91,12 +91,12 @@ description: "Task list for backend API with user ownership"
 
 ### Implementation for User Story 3
 
-- [ ] T023 [P] [US3] Implement PUT /todos/{id} endpoint with ownership validation in backend/src/api/routers/todos.py
-- [ ] T024 [US3] Add todo update with ownership validation in backend/src/services/todo_service.py
-- [ ] T025 [US3] Implement DELETE /todos/{id} endpoint with ownership validation in backend/src/api/routers/todos.py
-- [ ] T026 [US3] Add todo deletion with ownership validation in backend/src/services/todo_service.py
-- [ ] T027 [US3] Add validation logic for Todo updates in backend/src/models/todo.py
-- [ ] T028 [US3] Add comprehensive error handling for all operations in backend/src/api/routers/todos.py
+- [X] T023 [P] [US3] Implement PUT /todos/{id} endpoint with ownership validation in backend/src/api/routers/todos.py
+- [X] T024 [US3] Add todo update with ownership validation in backend/src/services/todo_service.py
+- [X] T025 [US3] Implement DELETE /todos/{id} endpoint with ownership validation in backend/src/api/routers/todos.py
+- [X] T026 [US3] Add todo deletion with ownership validation in backend/src/services/todo_service.py
+- [X] T027 [US3] Add validation logic for Todo updates in backend/src/models/todo.py
+- [X] T028 [US3] Add comprehensive error handling for all operations in backend/src/api/routers/todos.py
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -106,13 +106,13 @@ description: "Task list for backend API with user ownership"
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T029 [P] Documentation updates in backend/docs/api-reference.md
-- [ ] T030 Code cleanup and refactoring across all API endpoints
-- [ ] T031 Performance optimization of database queries
-- [ ] T032 [P] Additional unit tests in backend/tests/unit/
-- [ ] T033 Security hardening of authentication and authorization
-- [ ] T034 Run quickstart validation and testing
-- [ ] T035 Integration testing of all endpoints together in backend/tests/integration/
+- [X] T029 [P] Documentation updates in backend/docs/api-reference.md
+- [X] T030 Code cleanup and refactoring across all API endpoints
+- [X] T031 Performance optimization of database queries
+- [X] T032 [P] Additional unit tests in backend/tests/unit/
+- [X] T033 Security hardening of authentication and authorization
+- [X] T034 Run quickstart validation and testing
+- [X] T035 Integration testing of all endpoints together in backend/tests/integration/
 
 ---
 
