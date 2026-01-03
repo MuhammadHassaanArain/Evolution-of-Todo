@@ -14,7 +14,10 @@
       "Bash(.specify/scripts/bash/update-agent-context.sh claude)",
       "Bash(SPECIFY_FEATURE=001-database-layer .specify/scripts/bash/update-agent-context.sh claude)",
       "Bash(SPECIFY_FEATURE=001-database-layer bash -c 'source .specify/scripts/bash/common.sh; get_feature_paths')",
-      "Bash(SPECIFY_FEATURE=001-database-layer .specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks)"
+      "Bash(SPECIFY_FEATURE=001-database-layer .specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks)",
+      "Bash(.specify/scripts/bash/create-phr.sh --title \"Backend API Spec\" --stage spec --feature \"backend-api\" --json)",
+      "Bash(.specify/scripts/bash/create-phr.sh --title \"Backend API Plan\" --stage plan --feature \"backend-api\" --json)",
+      "Bash(SPECIFY_FEATURE=001-backend-api bash -c 'source .specify/scripts/bash/common.sh; get_feature_paths')"
     ]
   }
 }

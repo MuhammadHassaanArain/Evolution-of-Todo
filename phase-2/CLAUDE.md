@@ -220,8 +220,10 @@ See `.specify/memory/constitution.md` for code quality, testing, performance, se
 - JWT-based authentication with stateless tokens, Better Auth framework, python-jose, passlib/bcrypt (003-auth-isolated)
 - Python 3.13+ + SQLModel (001-database-layer)
 - Neon Serverless PostgreSQL (001-database-layer)
+- FastAPI + JWT authentication (001-backend-api)
 
 ## Recent Changes
+- 001-backend-api: Added FastAPI + JWT authentication for backend API with user-scoped todo management
 - 003-auth-isolated: Added JWT-based authentication with stateless tokens, Better Auth framework, python-jose, passlib/bcrypt
 - 001-database-layer: Added Python 3.13+ + SQLModel for database layer with user ownership
 - 001-todo-cli: Added Python 3.13+ (as required by constitution) + None required beyond standard library
