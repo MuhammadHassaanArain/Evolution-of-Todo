@@ -17,7 +17,14 @@
       "Bash(SPECIFY_FEATURE=001-database-layer .specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks)",
       "Bash(.specify/scripts/bash/create-phr.sh --title \"Backend API Spec\" --stage spec --feature \"backend-api\" --json)",
       "Bash(.specify/scripts/bash/create-phr.sh --title \"Backend API Plan\" --stage plan --feature \"backend-api\" --json)",
-      "Bash(SPECIFY_FEATURE=001-backend-api bash -c 'source .specify/scripts/bash/common.sh; get_feature_paths')"
+      "Bash(SPECIFY_FEATURE=001-backend-api bash -c 'source .specify/scripts/bash/common.sh; get_feature_paths')",
+      "Bash(.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks)",
+      "Bash(dir specs/001-frontend-routing)",
+      "Bash(SPECIFY_FEATURE=001-frontend-routing .specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks)",
+      "Bash(bash -c 'SPECIFY_FEATURE=001-frontend-routing pwd && ls -la specs/001-frontend-routing/ && .specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks')",
+      "Bash(cat specs/001-frontend-routing/contracts/api-contracts.md)",
+      "Bash(cat specs/001-frontend-routing/quickstart.md)",
+      "Bash(cat frontend/package.json)"
     ]
   }
 }
