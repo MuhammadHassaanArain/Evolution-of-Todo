@@ -5,6 +5,9 @@ from sqlmodel import Session
 from ..database.connection import get_session
 from ..utils.jwt import verify_access_token, get_user_id_from_token
 from ..models.user import User
+from ..models.validation import UNAUTHORIZED_ERROR, MISSING_AUTH_ERROR
+from ..schemas.error import UNAUTHORIZED_RESPONSE, MISSING_AUTH_RESPONSE
+from ..utils.jwt_validator import validate_authorization_header, validate_jwt_token
 
 
 # Initialize the HTTP Bearer security scheme
@@ -20,7 +23,7 @@ def get_current_user(
     session: Session = Depends(get_session)
 ) -> User:
     """
-    Dependency to get the current authenticated user from the JWT token.
+    Dependency to get the current authenticated user from the JWT token with enhanced validation.
 
     Args:
         credentials: The HTTP authorization credentials from the request header
@@ -34,39 +37,30 @@ def get_current_user(
     """
     token = credentials.credentials
 
-    # Verify the token and extract payload
-    payload = verify_access_token(token)
-    if not payload:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    # Validate the JWT token using the enhanced validation
+    payload = validate_jwt_token(token)
 
     # Get the user ID from the token
-    user_id = get_user_id_from_token(token)
+    user_id = payload.get("sub") if payload else None
     if not user_id:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
+            status_code=401,
+            detail=UNAUTHORIZED_RESPONSE.dict()
         )
 
     # Query the database for the user
     user = session.get(User, user_id)
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found",
-            headers={"WWW-Authenticate": "Bearer"},
+            status_code=401,
+            detail=UNAUTHORIZED_RESPONSE.dict()
         )
 
     # Check if the user is active
     if not user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Inactive user",
-            headers={"WWW-Authenticate": "Bearer"},
+            status_code=401,
+            detail=UNAUTHORIZED_RESPONSE.dict()
         )
 
     return user
@@ -112,13 +106,13 @@ def get_optional_user(
     try:
         token = credentials.credentials
 
-        # Verify the token and extract payload
-        payload = verify_access_token(token)
+        # Validate the JWT token using the enhanced validation
+        payload = validate_jwt_token(token)
         if not payload:
             return None
 
         # Get the user ID from the token
-        user_id = get_user_id_from_token(token)
+        user_id = payload.get("sub")
         if not user_id:
             return None
 
@@ -128,8 +122,11 @@ def get_optional_user(
             return None
 
         return user
+    except HTTPException:
+        # If it's an HTTPException (like validation errors), return None
+        return None
     except Exception:
-        # If any error occurs during authentication, return None
+        # If any other error occurs during authentication, return None
         return None
 
 

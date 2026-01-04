@@ -44,7 +44,8 @@
       "Bash(.specify/scripts/bash/create-phr.sh --title \"Validation Hardening Plan\" --stage plan --feature \"001-validation-hardening\" --json)",
       "Skill(sp.phr)",
       "Bash(.specify/scripts/bash/create-phr.sh --title \"Validation Hardening Tasks\" --stage tasks --feature \"001-validation-hardening\" --json)",
-      "Bash(SPECIFY_FEATURE=001-validation-hardening .specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks)"
+      "Bash(SPECIFY_FEATURE=001-validation-hardening .specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks)",
+      "Bash(.specify/scripts/bash/create-phr.sh --title \"Validation Hardening Implementation\" --stage green --feature \"001-validation-hardening\" --json)"
     ]
   }
 }
