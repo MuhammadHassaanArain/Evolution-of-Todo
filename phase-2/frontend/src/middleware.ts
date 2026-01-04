@@ -13,8 +13,8 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/login', req.url))
   }
 
-  // If user is trying to access auth pages (login/signup) while authenticated, redirect to dashboard
-  const authPaths = ['/login', '/signup']
+  // If user is trying to access auth pages (login/signup/forgot-password) while authenticated, redirect to dashboard
+  const authPaths = ['/login', '/signup', '/forgot-password']
   const isAuthRoute = authPaths.some(path => req.nextUrl.pathname.startsWith(path))
 
   if (isAuthRoute && token) {
@@ -25,5 +25,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/profile/:path*', '/todos/:path*', '/login', '/signup']
+  matcher: ['/dashboard/:path*', '/profile/:path*', '/todos/:path*', '/login', '/signup', '/forgot-password', '/']
 }

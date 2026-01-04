@@ -2,13 +2,15 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
+import { login as authServiceLogin, register as authServiceRegister, logout as authServiceLogout, getCurrentUser, isAuthenticated as checkIsAuthenticated } from '@/services/auth'
 
 interface AuthContextType {
   isAuthenticated: boolean
   user: any
+  isLoading: boolean
   login: (email: string, password: string) => Promise<void>
   logout: () => void
-  register: (userData: { email: string; password: string; username: string; first_name?: string; last_name?: string }) => Promise<void>
+  register: (userData: { email: string; password: string; username?: string; first_name?: string; last_name?: string }) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -16,44 +18,35 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
     // Check if user is authenticated on initial load
-    const token = localStorage.getItem('token')
-    if (token) {
-      setIsAuthenticated(true)
-      // In a real app, you would validate the token and get user data
+    const initAuth = async () => {
       try {
-        // Decode JWT token to get user info
-        const tokenPayload = JSON.parse(atob(token.split('.')[1]))
-        setUser(tokenPayload.user)
+        if (checkIsAuthenticated()) {
+          setIsAuthenticated(true)
+          const userData = await getCurrentUser()
+          setUser(userData)
+        }
       } catch (error) {
-        console.error('Error decoding token:', error)
-        localStorage.removeItem('token')
+        console.error('Error initializing auth:', error)
+        localStorage.removeItem('access_token')
+      } finally {
+        setIsLoading(false)
       }
     }
+
+    initAuth()
   }, [])
 
   const login = async (email: string, password: string) => {
     try {
-      // In a real app, this would be an API call to your backend
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        const { access_token } = data.data
-        localStorage.setItem('token', access_token)
+      const response = await authServiceLogin({ email, password })
+      if (response.user) {
         setIsAuthenticated(true)
-        // Decode JWT to get user info
-        const tokenPayload = JSON.parse(atob(access_token.split('.')[1]))
-        setUser(tokenPayload.user)
+        setUser(response.user)
         router.push('/dashboard')
       } else {
         throw new Error('Login failed')
@@ -64,20 +57,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const register = async (userData: { email: string; password: string; username: string; first_name?: string; last_name?: string }) => {
+  const register = async (userData: { email: string; password: string; username?: string; first_name?: string; last_name?: string }) => {
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        // Auto-login after registration
-        await login(userData.email, userData.password)
+      const response = await authServiceRegister(userData)
+      if (response.user) {
+        setIsAuthenticated(true)
+        setUser(response.user)
+        router.push('/dashboard')
       } else {
         throw new Error('Registration failed')
       }
@@ -87,15 +73,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const logout = () => {
-    localStorage.removeItem('token')
-    setIsAuthenticated(false)
-    setUser(null)
-    router.push('/login')
+  const logout = async () => {
+    try {
+      await authServiceLogout()
+    } catch (error) {
+      console.error('Logout error:', error)
+      // Even if the server logout fails, we still clear the client-side token
+    } finally {
+      setIsAuthenticated(false)
+      setUser(null)
+      router.push('/login')
+    }
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, register }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, isLoading, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   )

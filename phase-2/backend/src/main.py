@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .config import settings
-from .api.auth import router as auth_router
-from .api.tasks import router as tasks_router
-from .utils.security import add_security_headers
+from src.config import settings
+from src.api.auth import router as auth_router
+from src.api.tasks import router as tasks_router
+from src.utils.security import add_security_headers
 
 
 def create_app() -> FastAPI:

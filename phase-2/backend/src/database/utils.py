@@ -2,7 +2,7 @@ from sqlmodel import SQLModel, create_engine, Session
 from typing import Generator
 from contextlib import contextmanager
 import logging
-from ..config.settings import settings
+from ..config import settings
 
 
 def create_db_engine():

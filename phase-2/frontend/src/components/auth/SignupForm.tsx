@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { RegisterCredentials } from '../../types/auth';
 
 interface SignupFormProps {

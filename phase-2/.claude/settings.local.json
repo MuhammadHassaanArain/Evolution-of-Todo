@@ -26,7 +26,14 @@
       "Bash(cat specs/001-frontend-routing/quickstart.md)",
       "Bash(cat frontend/package.json)",
       "Bash(cat specs/001-ui-ux-polish/spec.md)",
-      "Bash(SPECIFY_FEATURE=001-ui-ux-polish bash -c '.specify/scripts/bash/check-prerequisites.sh --json')"
+      "Bash(SPECIFY_FEATURE=001-ui-ux-polish bash -c '.specify/scripts/bash/check-prerequisites.sh --json')",
+      "Bash(SPECIFY_FEATURE=001-ui-ux-polish .specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks)",
+      "Bash(SPECIFY_FEATURE=001-ui-ux-polish bash -c '.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks')",
+      "Bash(cat specs/001-ui-ux-polish/checklists/requirements.md)",
+      "Bash(cat specs/001-ui-ux-polish/tasks.md)",
+      "Bash(cat frontend/src/styles/theme.css)",
+      "Bash(cat frontend/src/components/ui/button.tsx)",
+      "Bash(powershell -Command \"Get-Content ''D:\\\\Hassaan_Work\\\\GIAIC\\\\Quarter-04\\\\Hackathons\\\\hackathon-2\\\\TODO\\\\phase-2\\\\frontend\\\\src\\\\components\\\\todo\\\\task-form.tsx'' | Select-Object -Last 50\")"
     ]
   }
 }

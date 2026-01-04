@@ -1,6 +1,6 @@
 # Implementation Plan: UI & UX Polish
 
-**Branch**: `001-ui-ux-polish` | **Date**: 2026-01-03 | **Spec**: [link](../spec.md)
+**Branch**: `001-ui-ux-polish` | **Date**: 2026-01-03 | **Spec**: [link](spec.md)
 **Input**: Feature specification from `/specs/001-ui-ux-polish/spec.md`
 
 **Note**: This template is filled in by the `/sp.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
@@ -28,10 +28,10 @@ Implementation of UI & UX polish for the Todo application frontend, focusing on 
 - ✅ **Spec-Driven Development**: Implementation based on written spec in `/specs/001-ui-ux-polish/spec.md`
 - ✅ **No Manual Coding**: All UI components generated via Claude Code from specifications
 - ✅ **Security & User Isolation**: UI only consumes data from backend, no security logic in frontend
-- ✅ **Frontend Standards**: Uses Next.js 16+ App Router as required by constitution
+- ✅ **Frontend Standards**: Uses Next.js 16+ App Router as required by specification
 - ✅ **Authentication Requirements**: UI consumes authenticated data but doesn't handle auth logic
 - ✅ **Specification Rules**: UI/UX polish follows specifications exactly without introducing business logic
-- ✅ **Frontend Standards**: Uses Tailwind CSS for styling as specified in constitution
+- ✅ **Frontend Standards**: Uses Tailwind CSS for styling as specified in specification
 
 ## Project Structure
 
@@ -86,25 +86,30 @@ frontend/
 │   │       ├── task-form.tsx
 │   │       └── empty-state.tsx
 │   ├── hooks/
-│   │   ├── use-media-query.ts
-│   │   ├── use-toggle.ts
-│   │   └── use-form.ts
+│   │   ├── useMediaQuery.ts
+│   │   ├── useToggle.ts
+│   │   └── useForm.ts
 │   ├── lib/
 │   │   ├── utils.ts         # Utility functions
-│   │   └── validations.ts   # Form validations
+│   │   ├── focus.ts         # Focus management utilities
+│   │   └── aria.ts          # ARIA attributes and accessibility utilities
 │   ├── styles/
-│   │   ├── globals.css      # Global Tailwind styles
-│   │   ├── theme.css        # Theme configuration
-│   │   └── components.css   # Component-specific styles
+│   │   ├── theme.css        # Color palette and theme variables
+│   │   ├── typography.css   # Typography scale and styles
+│   │   ├── spacing.css      # Spacing scale utilities
+│   │   ├── animations.css   # Transition animations
+│   │   └── elevation.css    # Shadow and border-radius styles
 │   └── types/
 │       └── ui.ts            # UI-specific type definitions
-└── tests/
-    ├── unit/
-    ├── integration/
-    └── visual/
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│   └── visual/
+└── docs/
+    └── ui-components-guide.md
 ```
 
-**Structure Decision**: Next.js App Router structure with clear separation of UI components, responsive layout components, and accessible task management components following Next.js best practices and constitution requirements for TypeScript and Tailwind CSS usage.
+**Structure Decision**: Next.js App Router structure with clear separation of UI components, responsive layout components, and accessible task management components following Next.js best practices and specification requirements for accessibility and responsive design.
 
 ## Complexity Tracking
 
