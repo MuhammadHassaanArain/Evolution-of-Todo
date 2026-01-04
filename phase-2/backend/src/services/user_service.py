@@ -22,7 +22,10 @@ class UserService:
         # Create the user
         db_user = User(
             email=user_create.email,
-            name=user_create.name,
+            username=user_create.username,
+            first_name=user_create.first_name,
+            last_name=user_create.last_name,
+            is_active=True,
             hashed_password=hashed_password
         )
         session.add(db_user)
@@ -65,8 +68,14 @@ class UserService:
             return None
 
         # Update the fields that were provided
-        if user_update.name is not None:
-            db_user.name = user_update.name
+        if user_update.username is not None:
+            db_user.username = user_update.username
+        if user_update.first_name is not None:
+            db_user.first_name = user_update.first_name
+        if user_update.last_name is not None:
+            db_user.last_name = user_update.last_name
+        if user_update.is_active is not None:
+            db_user.is_active = user_update.is_active
         if user_update.email is not None:
             # Check if the new email is already taken by another user
             existing_user = session.exec(

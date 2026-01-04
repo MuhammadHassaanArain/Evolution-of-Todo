@@ -51,3 +51,18 @@ class UserRead(UserBase):
     id: int
     created_at: datetime
     updated_at: datetime
+
+
+class UserLogin(SQLModel):
+    """
+    Model for user login credentials.
+    """
+    email: str
+    password: str
+
+
+class UserWithPassword(UserRead):
+    """
+    Model for user with password information (for internal use).
+    """
+    hashed_password: str

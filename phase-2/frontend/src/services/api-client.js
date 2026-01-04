@@ -1,18 +1,30 @@
 // API Client Service for frontend
 class ApiClient {
   constructor() {
-    this.baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+    // Use consistent API URL with the environment config
+    this.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+    // Normalize the base URL to ensure it doesn't end with a slash
+    if (this.baseURL.endsWith('/')) {
+      this.baseURL = this.baseURL.slice(0, -1);
+    }
     this.token = null;
   }
 
   // Set authentication token
   setToken(token) {
     this.token = token;
+    // Also store in localStorage for persistence
+    if (token) {
+      localStorage.setItem('access_token', token);
+    }
   }
 
   // Remove authentication token
   removeToken() {
     this.token = null;
+    // Also remove from localStorage
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('token');
   }
 
   // Create headers for requests
@@ -21,15 +33,17 @@ class ApiClient {
       'Content-Type': 'application/json',
     };
 
-    if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`;
+    // Use the access_token from localStorage if available, otherwise fallback to token
+    const token = localStorage.getItem('access_token') || localStorage.getItem('token') || this.token;
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
     }
 
     return headers;
   }
 
   // Make a request
-  async request(endpoint, options = {}) {
+  async request(endpoint, options = {}, requiresAuth = true) {
     const url = `${this.baseURL}${endpoint}`;
     const config = {
       headers: this.getHeaders(),
@@ -39,6 +53,20 @@ class ApiClient {
     // If body is provided and is an object, stringify it
     if (options.body && typeof options.body === 'object') {
       config.body = JSON.stringify(options.body);
+    }
+
+    // Add auth header only if required
+    if (requiresAuth) {
+      const token = localStorage.getItem('access_token') || localStorage.getItem('token') || this.token;
+      if (!token && requiresAuth) {
+        throw new Error('Authentication required');
+      }
+    } else {
+      // For auth requests (like login), don't add auth headers
+      config.headers = {
+        'Content-Type': 'application/json',
+        ...options.headers
+      };
     }
 
     try {
@@ -84,14 +112,14 @@ class ApiClient {
     return this.request('/auth/register', {
       method: 'POST',
       body: userData,
-    });
+    }, false); // Don't require auth for registration
   }
 
   async login(credentials) {
     const response = await this.request('/auth/login', {
       method: 'POST',
       body: credentials,
-    });
+    }, false); // Don't require auth for login
 
     // Store the token for future requests
     if (response && response.access_token) {
@@ -108,7 +136,7 @@ class ApiClient {
     // Optionally notify the backend (in JWT stateless systems, this is often client-side only)
     return this.request('/auth/logout', {
       method: 'POST',
-    });
+    }, false); // Don't require auth for logout
   }
 
   async getProfile() {

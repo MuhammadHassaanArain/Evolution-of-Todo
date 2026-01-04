@@ -1,13 +1,22 @@
 import React, { useState } from 'react';
-import apiClient from '../../services/api-client';
+import { apiClient } from '@/lib/api/client';
 
-const TaskForm = ({ onTaskCreated }) => {
+interface TaskData {
+  title: string;
+  description?: string;
+}
+
+interface TaskFormProps {
+  onTaskCreated?: (task: any) => void;
+}
+
+const TaskForm: React.FC<TaskFormProps> = ({ onTaskCreated }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
       setError('Title is required');
@@ -16,7 +25,7 @@ const TaskForm = ({ onTaskCreated }) => {
 
     try {
       setLoading(true);
-      const newTask = await apiClient.createTask({
+      const newTask = await apiClient.post('/tasks', {
         title: title.trim(),
         description: description.trim() || null
       });
@@ -26,7 +35,7 @@ const TaskForm = ({ onTaskCreated }) => {
       if (onTaskCreated) {
         onTaskCreated(newTask);
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message || 'Failed to create task');
     } finally {
       setLoading(false);

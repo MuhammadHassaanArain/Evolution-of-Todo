@@ -4,7 +4,7 @@ from sqlmodel import Session, select
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from fastapi import HTTPException, status, Depends
-from .config import settings
+from src.config import settings
 from ..models.user import User, UserCreate
 from ..utils.logging import log_auth_event
 
