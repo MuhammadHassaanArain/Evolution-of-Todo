@@ -39,7 +39,12 @@
       "Bash(.specify/scripts/bash/create-phr.sh --title \"Validation Hardening Spec\" --stage spec --json)",
       "Bash(.specify/scripts/bash/create-phr.sh --title \"Validation Hardening Spec\" --stage spec --feature \"001-validation-hardening\" --json)",
       "Bash(git rev-parse --show-toplevel)",
-      "Bash(git checkout 001-validation-hardening)"
+      "Bash(git checkout 001-validation-hardening)",
+      "Bash(SPECIFY_FEATURE=001-validation-hardening .specify/scripts/bash/update-agent-context.sh claude)",
+      "Bash(.specify/scripts/bash/create-phr.sh --title \"Validation Hardening Plan\" --stage plan --feature \"001-validation-hardening\" --json)",
+      "Skill(sp.phr)",
+      "Bash(.specify/scripts/bash/create-phr.sh --title \"Validation Hardening Tasks\" --stage tasks --feature \"001-validation-hardening\" --json)",
+      "Bash(SPECIFY_FEATURE=001-validation-hardening .specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks)"
     ]
   }
 }
