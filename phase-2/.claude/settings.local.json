@@ -33,7 +33,13 @@
       "Bash(cat specs/001-ui-ux-polish/tasks.md)",
       "Bash(cat frontend/src/styles/theme.css)",
       "Bash(cat frontend/src/components/ui/button.tsx)",
-      "Bash(powershell -Command \"Get-Content ''D:\\\\Hassaan_Work\\\\GIAIC\\\\Quarter-04\\\\Hackathons\\\\hackathon-2\\\\TODO\\\\phase-2\\\\frontend\\\\src\\\\components\\\\todo\\\\task-form.tsx'' | Select-Object -Last 50\")"
+      "Bash(powershell -Command \"Get-Content ''D:\\\\Hassaan_Work\\\\GIAIC\\\\Quarter-04\\\\Hackathons\\\\hackathon-2\\\\TODO\\\\phase-2\\\\frontend\\\\src\\\\components\\\\todo\\\\task-form.tsx'' | Select-Object -Last 50\")",
+      "Bash(cat \"D:/Hassaan_Work/GIAIC/Quarter-04/Hackathons/hackathon-2/TODO/specs/001-validation-hardening/spec.md\")",
+      "Bash(git rev-parse --abbrev-ref HEAD)",
+      "Bash(.specify/scripts/bash/create-phr.sh --title \"Validation Hardening Spec\" --stage spec --json)",
+      "Bash(.specify/scripts/bash/create-phr.sh --title \"Validation Hardening Spec\" --stage spec --feature \"001-validation-hardening\" --json)",
+      "Bash(git rev-parse --show-toplevel)",
+      "Bash(git checkout 001-validation-hardening)"
     ]
   }
 }
