@@ -2,6 +2,7 @@ from sqlmodel import Field, SQLModel, Relationship
 from typing import Optional
 from .base import BaseUUIDModel
 from .user import User
+from .user import UserRead
 from datetime import datetime
 
 
@@ -59,8 +60,7 @@ class TaskReadWithUser(TaskRead):
     """
     Schema for reading task data with user information
     """
-    user: Optional["UserRead"] = None
+    user: Optional[UserRead] = None
 
 
-# Forward reference setup
-TaskReadWithUser.update_forward_refs()
+

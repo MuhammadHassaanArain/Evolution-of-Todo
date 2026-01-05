@@ -1,7 +1,7 @@
-from sqlmodel import SQLModel
+from sqlmodel import SQLModel, Field
 from datetime import datetime
 from typing import Optional
-from pydantic import Field
+from uuid import UUID, uuid4
 
 
 class TimestampMixin:
@@ -12,8 +12,16 @@ class TimestampMixin:
     updated_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
 
 
-class BaseSQLModel(SQLModel):
+class BaseUUIDModel(SQLModel):
+    """
+    Base model with UUID primary key.
+    """
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+
+
+class BaseSQLModel(BaseUUIDModel, TimestampMixin):
     """
     Base class for all SQLModel models in the application.
+    Includes UUID primary key and timestamps.
     """
     pass
