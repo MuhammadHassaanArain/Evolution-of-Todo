@@ -2,7 +2,10 @@ from sqlmodel import SQLModel, Field, Relationship
 from typing import List, Optional
 from datetime import datetime
 from .base import TimestampMixin
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from .task import Task
 
 class UserBase(SQLModel):
     """
@@ -23,7 +26,7 @@ class User(UserBase, TimestampMixin, table=True):
     hashed_password: str = Field(nullable=False)
     
     # Relationship to Todo entities
-    todos: List["Todo"] = Relationship(back_populates="owner")
+    todos: List["Task"] = Relationship(back_populates="user")
 
 
 class UserCreate(UserBase):
