@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer
 from src.config import settings
 from src.api.auth import router as auth_router
 from src.api.tasks import router as tasks_router
@@ -19,6 +20,31 @@ def create_app() -> FastAPI:
         docs_url=f"{settings.api_prefix}/docs",
         redoc_url=f"{settings.api_prefix}/redoc",
     )
+
+    # Store the original openapi method to avoid recursion
+    original_openapi = app.openapi
+
+    # Add custom OpenAPI schema with security schemes for Swagger UI
+    def custom_openapi():
+        if app.openapi_schema:
+            return app.openapi_schema
+        openapi_schema = original_openapi()
+        if "components" not in openapi_schema:
+            openapi_schema["components"] = {}
+        if "securitySchemes" not in openapi_schema["components"]:
+            openapi_schema["components"]["securitySchemes"] = {}
+
+        openapi_schema["components"]["securitySchemes"]["BearerAuth"] = {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT",
+            "description": "Enter: Bearer {your JWT token}"
+        }
+
+        app.openapi_schema = openapi_schema
+        return app.openapi_schema
+
+    app.openapi = custom_openapi
 
     # Add security headers
     app = add_security_headers(app)
