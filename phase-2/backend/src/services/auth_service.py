@@ -96,9 +96,14 @@ class AuthService:
         # Hash the password
         hashed_password = self.get_password_hash(user_create.password)
 
+        # Validate that username is provided
+        if not user_create.username or not user_create.username.strip():
+            raise ValueError("Username is required and cannot be empty")
+
         # Create new user
         user = User(
             email=user_create.email,
+            username=user_create.username,
             first_name=user_create.first_name,
             last_name=user_create.last_name,
             hashed_password=hashed_password,
