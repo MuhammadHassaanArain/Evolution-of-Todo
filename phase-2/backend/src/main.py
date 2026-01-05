@@ -4,12 +4,13 @@ from src.config import settings
 from src.api.auth import router as auth_router
 from src.api.tasks import router as tasks_router
 from src.utils.security import add_security_headers
-
+from src.database.connection import create_db_and_tables
 
 def create_app() -> FastAPI:
     """
     Create and configure the FastAPI application
     """
+    create_db_and_tables()
     app = FastAPI(
         title="Todo API",
         description="A full-stack todo web application with user authentication and task management capabilities",

@@ -73,7 +73,7 @@ class Todo(TodoBase, TimestampMixin, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     
     # Foreign key to User with non-nullable constraint
-    owner_id: int = Field(nullable=False, foreign_key="user.id", ondelete="CASCADE")
+    owner_id: int = Field(nullable=False, foreign_key="users.id", ondelete="CASCADE")
     
     # Relationship to User entity
     owner: "User" = Relationship(back_populates="todos")

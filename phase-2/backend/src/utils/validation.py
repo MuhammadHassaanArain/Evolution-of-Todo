@@ -169,14 +169,14 @@ def validate_payload_for_todos_update(payload: Dict[str, Any]) -> Dict[str, Any]
     validate_user_id_not_in_payload(payload)
 
     # Validate allowed fields for todo updates
-    allowed_fields = ['title', 'description', 'completed']
+    allowed_fields = ['title', 'description', 'is_completed']
     validate_request_payload(payload, allowed_fields)
 
     # Validate data types for specific fields
     expected_types = {
         'title': str,
         'description': str,
-        'completed': bool
+        'is_completed': bool
     }
     validate_data_types(payload, expected_types)
 

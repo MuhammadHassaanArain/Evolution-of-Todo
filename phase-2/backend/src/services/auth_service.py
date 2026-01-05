@@ -11,7 +11,7 @@ from ..utils.logging import log_auth_event
 
 class AuthService:
     def __init__(self):
-        self.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+        self.pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
         self.secret_key = settings.jwt_secret
         self.algorithm = settings.jwt_algorithm
         self.access_token_expire_minutes = settings.jwt_expiration_minutes
