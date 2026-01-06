@@ -100,6 +100,7 @@ class TaskRead(TaskBase):
 
     class Config:
         from_attributes = True  # Enable ORM mode for SQLModel compatibility
+        arbitrary_types_allowed = True  # Allow arbitrary types for UUID conversion
 
 class TaskReadWithUser(TaskRead):
     user: Optional["UserRead"] = None
