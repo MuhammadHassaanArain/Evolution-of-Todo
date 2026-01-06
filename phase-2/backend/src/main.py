@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPBearer
 from src.config import settings
 from src.api.auth import router as auth_router
 from src.api.tasks import router as tasks_router
@@ -29,17 +28,27 @@ def create_app() -> FastAPI:
         if app.openapi_schema:
             return app.openapi_schema
         openapi_schema = original_openapi()
+
+        # Ensure components exist
         if "components" not in openapi_schema:
             openapi_schema["components"] = {}
         if "securitySchemes" not in openapi_schema["components"]:
             openapi_schema["components"]["securitySchemes"] = {}
 
-        openapi_schema["components"]["securitySchemes"]["BearerAuth"] = {
+        # Add Bearer token security scheme
+        openapi_schema["components"]["securitySchemes"]["HTTPBearer"] = {
             "type": "http",
             "scheme": "bearer",
             "bearerFormat": "JWT",
             "description": "Enter: Bearer {your JWT token}"
         }
+
+        # Add security requirement to protected paths
+        for path_name, path_item in openapi_schema.get("paths", {}).items():
+            for method, operation in path_item.items():
+                if path_name.startswith(f"{settings.api_prefix}/tasks"):  # Protect task endpoints
+                    if "security" not in operation:
+                        operation["security"] = [{"HTTPBearer": []}]
 
         app.openapi_schema = openapi_schema
         return app.openapi_schema

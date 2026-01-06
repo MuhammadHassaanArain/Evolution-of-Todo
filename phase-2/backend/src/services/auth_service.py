@@ -75,7 +75,7 @@ class AuthService:
         if payload is None:
             return None
 
-        user_id: str = payload.get("sub")
+        user_id: int = payload.get("sub")
         if user_id is None:
             return None
 

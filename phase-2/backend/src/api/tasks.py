@@ -5,7 +5,7 @@ from ..database.session import get_session
 from ..models.task import Task, TaskCreate, TaskUpdate, TaskRead
 from ..models.user import UserRead
 from ..services.task_service import task_service
-from ..middleware.auth import auth_middleware
+from .auth_dependency import get_current_user
 from ..utils.logging import log_task_event
 from ..utils.validation import validate_payload_for_todos_create, validate_payload_for_todos_update
 from ..models.validation import PERMISSION_DENIED_ERROR, RESOURCE_NOT_FOUND_ERROR
@@ -19,7 +19,7 @@ router = APIRouter()
 def get_tasks(
     offset: int = 0,
     limit: int = 100,
-    current_user: UserRead = Depends(auth_middleware.get_current_user),
+    current_user: UserRead = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
     """
@@ -40,7 +40,7 @@ def get_tasks(
 @router.post("/tasks", response_model=TaskRead, status_code=status.HTTP_201_CREATED)
 def create_task(
     task: TaskCreate,
-    current_user: UserRead = Depends(auth_middleware.get_current_user),
+    current_user: UserRead = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
     """
@@ -70,7 +70,7 @@ def create_task(
 @router.get("/tasks/{task_id}", response_model=TaskRead)
 def get_task(
     task_id: str,
-    current_user: UserRead = Depends(auth_middleware.get_current_user),
+    current_user: UserRead = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
     """
@@ -102,7 +102,7 @@ def get_task(
 def update_task(
     task_id: str,
     task_update: TaskUpdate,
-    current_user: UserRead = Depends(auth_middleware.get_current_user),
+    current_user: UserRead = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
     """
@@ -139,7 +139,7 @@ def update_task(
 @router.delete("/tasks/{task_id}")
 def delete_task(
     task_id: str,
-    current_user: UserRead = Depends(auth_middleware.get_current_user),
+    current_user: UserRead = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
     """

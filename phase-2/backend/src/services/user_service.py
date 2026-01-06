@@ -34,7 +34,7 @@ class UserService:
         log_auth_event("user_created", user=db_user, success=True)
         return db_user
 
-    def get_user_by_id(self, session: Session, user_id: str) -> Optional[User]:
+    def get_user_by_id(self, session: Session, user_id: int) -> Optional[User]:
         """
         Get a user by ID
         """
