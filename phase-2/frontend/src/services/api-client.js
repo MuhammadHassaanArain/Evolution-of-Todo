@@ -1,106 +1,49 @@
 // API Client Service for frontend
-class ApiClient {
+// This file is being deprecated in favor of the TypeScript client in lib/api/client.ts
+// But we'll keep it for backward compatibility
+import { apiClient as tsApiClient } from '../lib/api/client';
+
+// Create a wrapper to maintain compatibility with existing code
+class ApiClientWrapper {
   constructor() {
-    // Use consistent API URL with the environment config
-    this.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
-    // Normalize the base URL to ensure it doesn't end with a slash
-    if (this.baseURL.endsWith('/')) {
-      this.baseURL = this.baseURL.slice(0, -1);
-    }
-    this.token = null;
+    // Use the TypeScript API client as the base
+    this.tsClient = tsApiClient;
   }
 
   // Set authentication token
   setToken(token) {
-    this.token = token;
-    // Also store in localStorage for persistence
+    // The TypeScript client handles token storage in localStorage automatically
+    // We just need to ensure it's stored in localStorage for other parts of the app
     if (token) {
       localStorage.setItem('access_token', token);
+      localStorage.setItem('token', token);
     }
   }
 
   // Remove authentication token
   removeToken() {
-    this.token = null;
-    // Also remove from localStorage
     localStorage.removeItem('access_token');
     localStorage.removeItem('token');
   }
 
-  // Create headers for requests
-  getHeaders() {
-    const headers = {
-      'Content-Type': 'application/json',
-    };
-
-    // Use the access_token from localStorage if available, otherwise fallback to token
-    const token = localStorage.getItem('access_token') || localStorage.getItem('token') || this.token;
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    return headers;
-  }
-
-  // Make a request
+  // Make a request - this should map to the TypeScript client methods
   async request(endpoint, options = {}, requiresAuth = true) {
-    const url = `${this.baseURL}${endpoint}`;
-    const config = {
-      headers: this.getHeaders(),
-      ...options,
-    };
-
-    // If body is provided and is an object, stringify it
-    if (options.body && typeof options.body === 'object') {
-      config.body = JSON.stringify(options.body);
-    }
-
-    // Add auth header only if required
-    if (requiresAuth) {
-      const token = localStorage.getItem('access_token') || localStorage.getItem('token') || this.token;
-      if (!token && requiresAuth) {
-        throw new Error('Authentication required');
-      }
-    } else {
-      // For auth requests (like login), don't add auth headers
-      config.headers = {
-        'Content-Type': 'application/json',
-        ...options.headers
-      };
-    }
+    const method = options.method || 'GET';
+    const body = options.body;
 
     try {
-      const response = await fetch(url, config);
-
-      // Handle 401 Unauthorized
-      if (response.status === 401) {
-        this.removeToken();
-        throw new Error('Unauthorized: Please log in again');
+      switch (method) {
+        case 'GET':
+          return await this.tsClient.get(endpoint, { requiresAuth });
+        case 'POST':
+          return await this.tsClient.post(endpoint, body, { requiresAuth });
+        case 'PUT':
+          return await this.tsClient.put(endpoint, body, { requiresAuth });
+        case 'DELETE':
+          return await this.tsClient.delete(endpoint, { requiresAuth });
+        default:
+          throw new Error(`Unsupported method: ${method}`);
       }
-
-      // Handle 403 Forbidden
-      if (response.status === 403) {
-        throw new Error('Forbidden: You do not have permission to access this resource');
-      }
-
-      // Try to parse response as JSON
-      let data;
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        data = await response.json();
-      } else {
-        // For non-JSON responses (like DELETE), just return status
-        if (response.status === 204) {
-          return { success: true };
-        }
-        data = await response.text();
-      }
-
-      if (!response.ok) {
-        throw new Error(data.detail || `HTTP error! status: ${response.status}`);
-      }
-
-      return data;
     } catch (error) {
       console.error('API request error:', error);
       throw error;
@@ -109,71 +52,113 @@ class ApiClient {
 
   // Authentication methods
   async register(userData) {
-    return this.request('/auth/register', {
-      method: 'POST',
-      body: userData,
-    }, false); // Don't require auth for registration
+    // Use the TypeScript client directly for auth methods
+    // We'll make the call without auth requirement
+    try {
+      const response = await fetch(`${this.tsClient.baseUrl}/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || `HTTP error! status: ${response.status}`);
+      }
+
+      // Store the token for future requests
+      if (data && data.access_token) {
+        this.setToken(data.access_token);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error;
+    }
   }
 
   async login(credentials) {
-    const response = await this.request('/auth/login', {
-      method: 'POST',
-      body: credentials,
-    }, false); // Don't require auth for login
+    // Use direct fetch for login to avoid auth requirement
+    try {
+      const response = await fetch(`${this.tsClient.baseUrl}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
 
-    // Store the token for future requests
-    if (response && response.access_token) {
-      this.setToken(response.access_token);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || `HTTP error! status: ${response.status}`);
+      }
+
+      // Store the token for future requests
+      if (data && data.access_token) {
+        this.setToken(data.access_token);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
     }
-
-    return response;
   }
 
   async logout() {
-    // Remove the token from the client
-    this.removeToken();
-
-    // Optionally notify the backend (in JWT stateless systems, this is often client-side only)
-    return this.request('/auth/logout', {
-      method: 'POST',
-    }, false); // Don't require auth for logout
+    // Use direct fetch for logout to avoid auth requirement issues
+    try {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        await fetch(`${this.tsClient.baseUrl}/auth/logout`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+      }
+    } catch (error) {
+      console.error('Logout request failed:', error);
+      // Continue with clearing the token even if the server request fails
+    } finally {
+      this.removeToken();
+    }
   }
 
   async getProfile() {
-    return this.request('/auth/me');
+    // Use the TypeScript client's get method
+    return await this.tsClient.get('/auth/me');
   }
 
-  // Task methods
+  // Task methods - use the TypeScript client
   async getTasks(offset = 0, limit = 100) {
-    return this.request(`/tasks?offset=${offset}&limit=${limit}`);
+    return await this.tsClient.get(`/tasks?offset=${offset}&limit=${limit}`);
   }
 
   async createTask(taskData) {
-    return this.request('/tasks', {
-      method: 'POST',
-      body: taskData,
-    });
+    return await this.tsClient.post('/tasks', taskData);
   }
 
   async getTask(taskId) {
-    return this.request(`/tasks/${taskId}`);
+    return await this.tsClient.get(`/tasks/${taskId}`);
   }
 
   async updateTask(taskId, taskData) {
-    return this.request(`/tasks/${taskId}`, {
-      method: 'PUT',
-      body: taskData,
-    });
+    return await this.tsClient.put(`/tasks/${taskId}`, taskData);
   }
 
   async deleteTask(taskId) {
-    return this.request(`/tasks/${taskId}`, {
-      method: 'DELETE',
-    });
+    return await this.tsClient.delete(`/tasks/${taskId}`);
   }
 }
 
 // Create a singleton instance
-const apiClient = new ApiClient();
+const apiClient = new ApiClientWrapper();
 
 export default apiClient;

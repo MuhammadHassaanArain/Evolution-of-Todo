@@ -10,10 +10,10 @@ export interface Task {
   title: string
   description?: string
   completed: boolean
-  createdAt: string
-  updatedAt: string
+  created_at: string  // Updated to match backend format
+  updated_at: string  // Updated to match backend format
   priority?: 'low' | 'medium' | 'high'
-  dueDate?: string
+  due_date?: string  // Updated to match backend format
 }
 
 export interface TaskListProps {
@@ -65,9 +65,9 @@ export const TaskList: React.FC<TaskListProps> = ({
   // Sort tasks based on selected option
   const sortedTasks = [...filteredTasks].sort((a, b) => {
     if (sortOption === 'newest') {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()  // Updated field name
     } else if (sortOption === 'oldest') {
-      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()  // Updated field name
     } else if (sortOption === 'priority') {
       const priorityOrder = { high: 3, medium: 2, low: 1 }
       return (priorityOrder[b.priority || 'medium'] || 2) - (priorityOrder[a.priority || 'medium'] || 2)
@@ -143,10 +143,10 @@ export const TaskList: React.FC<TaskListProps> = ({
               title={task.title}
               description={task.description}
               completed={task.completed}
-              createdAt={task.createdAt}
-              updatedAt={task.updatedAt}
+              created_at={task.created_at}
+              updated_at={task.updated_at}
               priority={task.priority}
-              dueDate={task.dueDate}
+              due_date={task.due_date}
               onToggle={() => onToggleTask?.(task.id)}
               onEdit={() => onEditTask?.(task.id)}
               onDelete={() => onDeleteTask?.(task.id)}

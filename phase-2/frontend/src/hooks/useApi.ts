@@ -14,11 +14,15 @@ interface UseApiReturn<T> {
   refetch: () => void;
 }
 
+interface UseApiOptionsWithBody extends UseApiOptions {
+  body?: any;
+}
+
 function useApi<T>(
   endpoint: string,
-  options: UseApiOptions = {}
+  options: UseApiOptionsWithBody = {}
 ): UseApiReturn<T> {
-  const { method = 'GET', requiresAuth = true, autoTrigger = true } = options;
+  const { method = 'GET', requiresAuth = true, autoTrigger = true, body } = options;
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,10 +40,10 @@ function useApi<T>(
           result = await apiClient.get<T>(endpoint, { requiresAuth });
           break;
         case 'POST':
-          result = await apiClient.post<T>(endpoint, null, { requiresAuth });
+          result = await apiClient.post<T>(endpoint, body, { requiresAuth });
           break;
         case 'PUT':
-          result = await apiClient.put<T>(endpoint, null, { requiresAuth });
+          result = await apiClient.put<T>(endpoint, body, { requiresAuth });
           break;
         case 'DELETE':
           result = await apiClient.delete<T>(endpoint, { requiresAuth });
@@ -56,7 +60,7 @@ function useApi<T>(
     } finally {
       setLoading(false);
     }
-  }, [endpoint, method, requiresAuth]);
+  }, [endpoint, method, requiresAuth, body]);
 
   useEffect(() => {
     if (autoTrigger) {

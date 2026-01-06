@@ -45,7 +45,16 @@
       "Skill(sp.phr)",
       "Bash(.specify/scripts/bash/create-phr.sh --title \"Validation Hardening Tasks\" --stage tasks --feature \"001-validation-hardening\" --json)",
       "Bash(SPECIFY_FEATURE=001-validation-hardening .specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks)",
-      "Bash(.specify/scripts/bash/create-phr.sh --title \"Validation Hardening Implementation\" --stage green --feature \"001-validation-hardening\" --json)"
+      "Bash(.specify/scripts/bash/create-phr.sh --title \"Validation Hardening Implementation\" --stage green --feature \"001-validation-hardening\" --json)",
+      "Bash(powershell -Command \"Get-ChildItem -Path frontend/src/app -Name\")",
+      "Bash(powershell -Command \"Get-ChildItem -Path frontend/src/app/''\\(protected\\)'' -Name\")",
+      "Bash(powershell -Command \"Get-ChildItem -Path frontend/src/app/''\\(protected\\)''/todos -Name\")",
+      "Bash(powershell -Command \"Get-ChildItem -Path frontend/src/app/''''\\(auth\\)'''' -Name\")",
+      "Bash(dir frontendsrcapp*protected*todos /s)",
+      "Bash(find frontend/src/app -name \"*.tsx\" -exec grep -l \"TaskList\\\\|TaskForm\" {} ;)",
+      "Bash(find frontend/src/app -name \"*.tsx\" -exec grep -l \"Task\\\\|task\" {} ;)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npm run build)"
     ]
   }
 }

@@ -9,14 +9,14 @@ export interface TaskItemProps {
   title: string
   description?: string
   completed: boolean
-  createdAt: string
-  updatedAt: string
+  created_at: string  // Updated to match backend format
+  updated_at: string  // Updated to match backend format
   onToggle?: () => void
   onEdit?: () => void
   onDelete?: () => void
   className?: string
   priority?: 'low' | 'medium' | 'high'
-  dueDate?: string
+  due_date?: string  // Updated to match backend format
 }
 
 export const TaskItem: React.FC<TaskItemProps> = ({
@@ -24,14 +24,14 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   title,
   description,
   completed,
-  createdAt,
-  updatedAt,
+  created_at,
+  updated_at,
   onToggle,
   onEdit,
   onDelete,
   className,
   priority = 'medium',
-  dueDate,
+  due_date,
   ...props
 }) => {
   const priorityColors = {
@@ -101,16 +101,16 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                   </span>
                 )}
 
-                {dueDate && (
+                {due_date && (
                   <span
                     className={cn(
                       'text-xs px-2 py-1 rounded',
-                      new Date(dueDate) < new Date() && !completed
+                      new Date(due_date) < new Date() && !completed
                         ? 'bg-red-100 text-red-800'
                         : 'bg-gray-100 text-gray-800'
                     )}
                   >
-                    Due: {formatDate(dueDate)}
+                    Due: {formatDate(due_date)}
                   </span>
                 )}
               </div>
@@ -128,9 +128,9 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             )}
 
             <div className="mt-2 flex items-center text-xs text-gray-500">
-              <span>Created: {formatDate(createdAt)}</span>
-              {updatedAt !== createdAt && (
-                <span className="ml-3">Updated: {formatDate(updatedAt)}</span>
+              <span>Created: {formatDate(created_at)}</span>
+              {updated_at !== created_at && (
+                <span className="ml-3">Updated: {formatDate(updated_at)}</span>
               )}
             </div>
           </div>
@@ -159,4 +159,3 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   )
 }
 
-export { TaskItem }

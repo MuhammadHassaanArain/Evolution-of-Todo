@@ -15,7 +15,7 @@ export interface TaskFormValues {
 
 export interface TaskFormProps {
   initialValues?: TaskFormValues
-  onSubmit: (values: TaskFormValues) => void
+  onSubmit: (values: TaskFormValues) => Promise<void> // Changed to async
   onCancel?: () => void
   submitText?: string
   className?: string
@@ -38,6 +38,7 @@ export const TaskForm: React.FC<TaskFormProps> = React.memo(({
 }) => {
   const [formData, setFormData] = useState<TaskFormValues>(initialValues)
   const [errors, setErrors] = useState<Partial<TaskFormValues>>({})
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -53,7 +54,12 @@ export const TaskForm: React.FC<TaskFormProps> = React.memo(({
         [name]: undefined
       }))
     }
-  }, [errors])
+
+    // Clear submit error when user starts typing
+    if (submitError) {
+      setSubmitError(null)
+    }
+  }, [errors, submitError])
 
   const handlePriorityChange = useCallback((value: string) => {
     setFormData(prev => ({
@@ -68,7 +74,12 @@ export const TaskForm: React.FC<TaskFormProps> = React.memo(({
         priority: undefined
       }))
     }
-  }, [errors])
+
+    // Clear submit error when user changes priority
+    if (submitError) {
+      setSubmitError(null)
+    }
+  }, [errors, submitError])
 
   const handleDateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -83,7 +94,12 @@ export const TaskForm: React.FC<TaskFormProps> = React.memo(({
         dueDate: undefined
       }))
     }
-  }, [errors])
+
+    // Clear submit error when user changes date
+    if (submitError) {
+      setSubmitError(null)
+    }
+  }, [errors, submitError])
 
   const validate = useCallback((): boolean => {
     const newErrors: Partial<TaskFormValues> = {}
@@ -102,13 +118,28 @@ export const TaskForm: React.FC<TaskFormProps> = React.memo(({
     return Object.keys(newErrors).length === 0
   }, [formData])
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (validate()) {
-      onSubmit(formData)
+      try {
+        setSubmitError(null)
+        await onSubmit(formData)
+        // Clear form after successful submission
+        if (!initialValues || !initialValues.hasOwnProperty('id')) { // Only clear if creating new task
+          setFormData({
+            title: '',
+            description: '',
+            priority: 'medium',
+            dueDate: ''
+          })
+        }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'An error occurred'
+        setSubmitError(errorMessage)
+      }
     }
-  }, [validate, onSubmit, formData])
+  }, [validate, onSubmit, formData, initialValues])
 
   return (
     <form onSubmit={handleSubmit} className={cn('space-y-4', className)} {...props}>
@@ -155,6 +186,12 @@ export const TaskForm: React.FC<TaskFormProps> = React.memo(({
           error={errors.dueDate}
         />
       </div>
+
+      {submitError && (
+        <div className="text-sm text-red-600 p-2 bg-red-50 rounded-md">
+          {submitError}
+        </div>
+      )}
 
       <div className="flex justify-end space-x-3 pt-2">
         {onCancel && (

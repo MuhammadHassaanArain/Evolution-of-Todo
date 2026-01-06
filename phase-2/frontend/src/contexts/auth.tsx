@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
-import { login as authServiceLogin, register as authServiceRegister, logout as authServiceLogout, getCurrentUser, isAuthenticated as checkIsAuthenticated } from '@/services/auth'
+import * as authService from '@/services/auth'
 
 interface AuthContextType {
   isAuthenticated: boolean
@@ -25,14 +25,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Check if user is authenticated on initial load
     const initAuth = async () => {
       try {
-        if (checkIsAuthenticated()) {
+        if (authService.isAuthenticated()) {
           setIsAuthenticated(true)
-          const userData = await getCurrentUser()
+          const userData = await authService.getProfile()
           setUser(userData)
         }
       } catch (error) {
         console.error('Error initializing auth:', error)
         localStorage.removeItem('access_token')
+        localStorage.removeItem('token')
       } finally {
         setIsLoading(false)
       }
@@ -43,10 +44,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await authServiceLogin({ email, password })
-      if (response.user) {
+      const response = await authService.login({ email, password })
+      if (response) {
         setIsAuthenticated(true)
-        setUser(response.user)
+        setUser(response.user || response)
         router.push('/dashboard')
       } else {
         throw new Error('Login failed')
@@ -59,10 +60,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (userData: { email: string; password: string; username?: string; first_name?: string; last_name?: string }) => {
     try {
-      const response = await authServiceRegister(userData)
-      if (response.user) {
+      const response = await authService.register(userData)
+      if (response) {
         setIsAuthenticated(true)
-        setUser(response.user)
+        setUser(response.user || response)
         router.push('/dashboard')
       } else {
         throw new Error('Registration failed')
@@ -75,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await authServiceLogout()
+      await authService.logout()
     } catch (error) {
       console.error('Logout error:', error)
       // Even if the server logout fails, we still clear the client-side token

@@ -1,17 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import TaskList from '@/components/tasks/TaskList';
-import TaskForm from '@/components/tasks/TaskForm';
+import TaskListContainer from '@/components/todo/task-list-container';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function TodosPage() {
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-
-  const handleTaskCreated = () => {
-    setRefreshTrigger(prev => prev + 1);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <main>
@@ -22,8 +14,7 @@ export default function TodosPage() {
                 <CardTitle>Todo Management</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <TaskForm onTaskCreated={handleTaskCreated} />
-                <TaskList key={refreshTrigger} />
+                <TaskListContainer />
               </CardContent>
             </Card>
           </div>
