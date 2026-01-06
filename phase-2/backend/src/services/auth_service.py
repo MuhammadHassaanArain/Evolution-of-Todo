@@ -79,8 +79,15 @@ class AuthService:
         if payload is None:
             return None
 
-        user_id: int = payload.get("sub")
-        if user_id is None:
+        # Extract sub from payload and convert to int for database lookup
+        user_id_str = payload.get("sub")
+        if user_id_str is None:
+            return None
+
+        # Convert string sub back to integer for database query
+        try:
+            user_id: int = int(user_id_str)
+        except (ValueError, TypeError):
             return None
 
         statement = select(User).where(User.id == user_id)
