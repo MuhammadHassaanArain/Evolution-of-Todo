@@ -69,15 +69,19 @@ class TaskBase(SQLModel):
     description: Optional[str] = Field(default=None, max_length=1000)
     is_completed: bool = Field(default=False)
 
+from .base import TimestampMixin
+
 class Task(TaskBase, BaseUUIDModel, table=True):
     __tablename__ = "tasks"
 
     user_id: int = Field(foreign_key="users.id", nullable=False)  # must match User.__tablename__
 
-    # Relationship to User
-    user: Optional["User"] = Relationship(back_populates="tasks")
-
+    # Add timestamps directly to match the TaskRead schema expectations
+    created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    # Relationship to User (using string reference to avoid circular import)
+    user: Optional["User"] = Relationship(back_populates="tasks")
 
 # Schemas
 class TaskCreate(TaskBase):
@@ -93,6 +97,9 @@ class TaskRead(TaskBase):
     user_id: int
     created_at: datetime
     updated_at: datetime
+
+    class Config:
+        from_attributes = True  # Enable ORM mode for SQLModel compatibility
 
 class TaskReadWithUser(TaskRead):
     user: Optional["UserRead"] = None
