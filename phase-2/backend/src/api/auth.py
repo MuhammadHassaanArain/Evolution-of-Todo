@@ -5,7 +5,7 @@ from ..database.session import get_session
 from ..models.user import UserCreate, UserLogin, UserRead
 from ..services.user_service import user_service
 from ..services.auth_service import auth_service
-from ..middleware.auth import auth_middleware
+from .auth_dependency import get_current_user
 from ..utils.logging import log_auth_event
 
 
@@ -78,7 +78,7 @@ def logout():
 
 
 @router.get("/auth/me", response_model=UserRead)
-def get_current_user(current_user: UserRead = Depends(auth_middleware.get_current_user)):
+def get_current_user_endpoint(current_user: UserRead = Depends(get_current_user)):
     """
     Get current authenticated user
     """
