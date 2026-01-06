@@ -48,6 +48,10 @@ class AuthService:
         """
         to_encode = data.copy()
 
+        # Ensure sub is always a string for consistent JWT handling
+        if "sub" in to_encode:
+            to_encode["sub"] = str(to_encode["sub"])
+
         if expires_delta:
             expire = datetime.utcnow() + expires_delta
         else:

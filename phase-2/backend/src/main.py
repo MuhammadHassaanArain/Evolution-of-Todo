@@ -35,20 +35,24 @@ def create_app() -> FastAPI:
         if "securitySchemes" not in openapi_schema["components"]:
             openapi_schema["components"]["securitySchemes"] = {}
 
-        # Add Bearer token security scheme
-        openapi_schema["components"]["securitySchemes"]["HTTPBearer"] = {
-            "type": "http",
-            "scheme": "bearer",
-            "bearerFormat": "JWT",
-            "description": "Enter: Bearer {your JWT token}"
-        }
+        # Add Bearer token security scheme - only if not already present
+        if "JWT" not in openapi_schema["components"]["securitySchemes"]:
+            openapi_schema["components"]["securitySchemes"]["JWT"] = {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "Enter: Bearer {your JWT token}"
+            }
 
-        # Add security requirement to protected paths
+        # Add security requirement to protected paths - use the JWT scheme name to match the dependency
         for path_name, path_item in openapi_schema.get("paths", {}).items():
             for method, operation in path_item.items():
                 if path_name.startswith(f"{settings.api_prefix}/tasks"):  # Protect task endpoints
                     if "security" not in operation:
-                        operation["security"] = [{"HTTPBearer": []}]
+                        operation["security"] = [{"JWT": []}]
+                elif path_name.startswith(f"{settings.api_prefix}/auth/me"):  # Protect auth/me endpoint
+                    if "security" not in operation:
+                        operation["security"] = [{"JWT": []}]
 
         app.openapi_schema = openapi_schema
         return app.openapi_schema
