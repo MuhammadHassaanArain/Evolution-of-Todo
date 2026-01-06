@@ -10,21 +10,21 @@ interface EnvironmentConfig {
 
 // Default configuration
 const defaultConfig: EnvironmentConfig = {
-  apiUrl: 'http://localhost:8000/api/v1',
+  apiUrl: 'http://localhost:8000',
   jwtSecret: 'your-jwt-secret-for-validation',
   environment: 'development',
 };
 
 // Production overrides
 const productionConfig: EnvironmentConfig = {
-  apiUrl: 'https://api.todoapp.com/v1',
+  apiUrl: 'https://api.todoapp.com',
   jwtSecret: process.env.NEXT_PUBLIC_JWT_SECRET || 'fallback-jwt-secret',
   environment: 'production',
 };
 
 // Test overrides
 const testConfig: EnvironmentConfig = {
-  apiUrl: 'http://localhost:8000/api/v1',
+  apiUrl: 'http://localhost:8000',
   jwtSecret: 'test-jwt-secret',
   environment: 'test',
 };

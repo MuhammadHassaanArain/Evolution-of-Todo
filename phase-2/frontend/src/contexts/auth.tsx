@@ -26,12 +26,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const initAuth = async () => {
       try {
         if (authService.isAuthenticated()) {
-          setIsAuthenticated(true)
           const userData = await authService.getProfile()
+          setIsAuthenticated(true)
           setUser(userData)
         }
       } catch (error) {
         console.error('Error initializing auth:', error)
+        // Don't set isAuthenticated to true if getProfile fails
+        // The token might be invalid, so clear it
         localStorage.removeItem('access_token')
         localStorage.removeItem('token')
       } finally {

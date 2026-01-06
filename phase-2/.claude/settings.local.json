@@ -54,7 +54,14 @@
       "Bash(find frontend/src/app -name \"*.tsx\" -exec grep -l \"TaskList\\\\|TaskForm\" {} ;)",
       "Bash(find frontend/src/app -name \"*.tsx\" -exec grep -l \"Task\\\\|task\" {} ;)",
       "Bash(npx tsc --noEmit)",
-      "Bash(npm run build)"
+      "Bash(npm run build)",
+      "Bash(powershell -Command \"Get-ChildItem -Path frontend/src/app/''''\\(protected\\)'''' -Recurse -Name\")",
+      "Bash(ls -la frontend/src/app/*protected*/)",
+      "Bash(ls -la frontend/src/app/*auth*/login/)",
+      "Bash(ls -la frontend/src/middleware*)",
+      "Bash(dir *.env* /s)",
+      "Bash(dir *.env*)",
+      "Bash(powershell -Command \"Get-ChildItem -Path . -Filter ''*.env*'' -Recurse\")"
     ]
   }
 }

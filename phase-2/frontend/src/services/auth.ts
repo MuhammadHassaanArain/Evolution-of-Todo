@@ -1,59 +1,39 @@
 import { LoginCredentials, RegisterCredentials, AuthToken, AuthUser, AuthResponse, AuthError } from '../types/auth';
+import { apiClient } from '../lib/api/client';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
 /**
  * Register a new user
  */
 export const register = async (credentials: RegisterCredentials): Promise<AuthResponse> => {
-  const response = await fetch(`${API_BASE_URL}/auth/register`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(credentials),
-  });
+  // Registration doesn't require auth, so we set requiresAuth to false
+  const response = await apiClient.post('/auth/register', credentials, { requiresAuth: false });
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    const error: AuthError = data;
-    throw new Error(error.detail || 'Registration failed');
+  // Store the token in localStorage and cookies
+  if (response.access_token) {
+    localStorage.setItem('access_token', response.access_token);
+    // Also set as a cookie for server-side access
+    document.cookie = `access_token=${response.access_token}; path=/; max-age=3600; SameSite=Lax;`;
   }
 
-  // Store the token in localStorage
-  if (data.access_token) {
-    localStorage.setItem('access_token', data.access_token);
-  }
-
-  return data as AuthResponse;
+  return response as AuthResponse;
 };
 
 /**
  * Login a user
  */
 export const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(credentials),
-  });
+  // Login doesn't require auth, so we set requiresAuth to false
+  const response = await apiClient.post('/auth/login', credentials, { requiresAuth: false });
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    const error: AuthError = data;
-    throw new Error(error.detail || 'Login failed');
+  // Store the token in localStorage and cookies
+  if (response.access_token) {
+    localStorage.setItem('access_token', response.access_token);
+    // Also set as a cookie for server-side access
+    document.cookie = `access_token=${response.access_token}; path=/; max-age=3600; SameSite=Lax;`;
   }
 
-  // Store the token in localStorage
-  if (data.access_token) {
-    localStorage.setItem('access_token', data.access_token);
-  }
-
-  return data as AuthResponse;
+  return response as AuthResponse;
 };
 
 /**
@@ -68,22 +48,15 @@ export const logout = async (): Promise<void> => {
   // So we just clear the client-side token
   try {
     // Use the apiClient for consistency
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      await fetch(`${API_BASE_URL}/auth/logout`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-    }
+    await apiClient.post('/auth/logout', {}, { requiresAuth: true });
   } catch (error) {
     // Even if the server logout fails, we still clear the client-side token
     console.warn('Logout request failed, but clearing local token anyway', error);
   } finally {
     localStorage.removeItem('access_token');
     localStorage.removeItem('token');
+    // Also clear the cookie
+    document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
   }
 };
 
@@ -97,22 +70,10 @@ export const getCurrentUser = async (): Promise<AuthUser> => {
     throw new Error('No authentication token found');
   }
 
-  const response = await fetch(`${API_BASE_URL}/auth/me`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-  });
+  // Use the apiClient to ensure proper URL construction and headers
+  const response = await apiClient.get('/auth/me', { requiresAuth: true });
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    const error: AuthError = data;
-    throw new Error(error.detail || 'Failed to get user info');
-  }
-
-  return data as AuthUser;
+  return response as AuthUser;
 };
 
 /**
