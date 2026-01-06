@@ -16,7 +16,7 @@ def test_create_task():
 
     # Create a task to create
     task_create = TaskCreate(title="Test Task", description="Test Description")
-    user_id = "test_user_id"
+    user_id = 123  # Use integer for user_id
 
     # Mock the session.add, commit, and refresh methods
     mock_session.add = Mock()
@@ -44,13 +44,14 @@ def test_create_task():
 
 def test_get_task_by_id():
     """Test getting a task by ID"""
+    from uuid import uuid4
     task_service = TaskService()
 
     # Create a mock session
     mock_session = Mock()
 
-    task_id = "test_task_id"
-    user_id = "test_user_id"
+    task_id = str(uuid4())  # Use a valid UUID string
+    user_id = 123  # Use integer for user_id
 
     # Mock the select query and result
     mock_statement = Mock()
@@ -70,13 +71,14 @@ def test_get_task_by_id():
 
 def test_update_task():
     """Test updating a task"""
+    from uuid import uuid4
     task_service = TaskService()
 
     # Create a mock session
     mock_session = Mock()
 
-    task_id = "test_task_id"
-    user_id = "test_user_id"
+    task_id = str(uuid4())  # Use a valid UUID string
+    user_id = 123  # Use integer for user_id
 
     # Create a task update
     from src.models.task import TaskUpdate
@@ -102,13 +104,14 @@ def test_update_task():
 
 def test_delete_task():
     """Test deleting a task"""
+    from uuid import uuid4
     task_service = TaskService()
 
     # Create a mock session
     mock_session = Mock()
 
-    task_id = "test_task_id"
-    user_id = "test_user_id"
+    task_id = str(uuid4())  # Use a valid UUID string
+    user_id = 123  # Use integer for user_id
 
     # Mock the get_task_by_id method to return a task
     mock_task = Mock()

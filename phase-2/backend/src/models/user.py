@@ -65,7 +65,7 @@ from datetime import datetime
 from .base import TimestampMixin
 
 if TYPE_CHECKING:
-    from .tasks import Task  # forward reference for type hints
+    from .task import Task  # forward reference for type hints
 
 class UserBase(SQLModel):
     """

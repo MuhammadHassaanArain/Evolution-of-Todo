@@ -4,12 +4,20 @@ from typing import Optional
 from uuid import UUID, uuid4
 
 
+def utcnow():
+    """
+    Function to return current UTC time.
+    Used as default factory for timestamp fields.
+    """
+    return datetime.utcnow()
+
+
 class TimestampMixin:
     """
     Mixin class to add created_at and updated_at timestamp fields to models.
     """
-    created_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
-    updated_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
+    created_at: Optional[datetime] = Field(default_factory=utcnow)
+    updated_at: Optional[datetime] = Field(default_factory=utcnow)
 
 
 class BaseUUIDModel(SQLModel):

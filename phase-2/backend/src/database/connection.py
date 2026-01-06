@@ -29,6 +29,7 @@ def create_db_and_tables():
     """
     from ..models.user import User
     from ..models.todo import Todo
+    from ..models.task import Task
     from sqlmodel import SQLModel
 
     # Import all models here to ensure they're registered with SQLModel

@@ -59,6 +59,7 @@
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, TYPE_CHECKING
 from datetime import datetime
+from pydantic import field_validator
 from .base import BaseUUIDModel
 
 if TYPE_CHECKING:
@@ -93,7 +94,7 @@ class TaskUpdate(SQLModel):
     is_completed: Optional[bool] = None
 
 class TaskRead(TaskBase):
-    id: str
+    id: str  # Will be converted from UUID to string
     user_id: int
     created_at: datetime
     updated_at: datetime
@@ -101,6 +102,14 @@ class TaskRead(TaskBase):
     class Config:
         from_attributes = True  # Enable ORM mode for SQLModel compatibility
         arbitrary_types_allowed = True  # Allow arbitrary types for UUID conversion
+
+    @field_validator('id', mode='before')
+    @classmethod
+    def validate_id(cls, v):
+        # Convert UUID to string if needed
+        if hasattr(v, '__str__'):
+            return str(v)
+        return v
 
 class TaskReadWithUser(TaskRead):
     user: Optional["UserRead"] = None
