@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useRouter } from 'next/router';
-import { useAuth } from '../../context/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../../contexts/auth';
 
 interface LogoutButtonProps {
   onLogout?: () => void;

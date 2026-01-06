@@ -1,6 +1,6 @@
 import { LoginCredentials, RegisterCredentials, AuthToken, AuthUser, AuthResponse, AuthError } from '../types/auth';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
 /**
  * Register a new user
@@ -62,22 +62,28 @@ export const login = async (credentials: LoginCredentials): Promise<AuthResponse
 export const logout = async (): Promise<void> => {
   // Remove the token from localStorage
   localStorage.removeItem('access_token');
+  localStorage.removeItem('token'); // Also clear the other token key
 
   // In a stateless JWT system, the server doesn't store sessions
   // So we just clear the client-side token
   try {
-    await fetch(`${API_BASE_URL}/auth/logout`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-        'Content-Type': 'application/json',
-      },
-    });
+    // Use the apiClient for consistency
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+    }
   } catch (error) {
     // Even if the server logout fails, we still clear the client-side token
     console.warn('Logout request failed, but clearing local token anyway', error);
   } finally {
     localStorage.removeItem('access_token');
+    localStorage.removeItem('token');
   }
 };
 
@@ -107,6 +113,13 @@ export const getCurrentUser = async (): Promise<AuthUser> => {
   }
 
   return data as AuthUser;
+};
+
+/**
+ * Get current user info (alias for getCurrentUser)
+ */
+export const getProfile = async (): Promise<AuthUser> => {
+  return getCurrentUser();
 };
 
 /**

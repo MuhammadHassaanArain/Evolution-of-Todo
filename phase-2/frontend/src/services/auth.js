@@ -1,10 +1,10 @@
-import apiClient from './api-client';
+import { apiClient } from './api-client';
 
 class AuthService {
   constructor() {
     this.currentUser = null;
     this.token = null;
-    this.tokenKey = 'todo_app_token';
+    this.tokenKey = 'access_token'; // Use consistent token key
 
     // Initialize from localStorage on construction
     this.initFromStorage();
@@ -12,11 +12,16 @@ class AuthService {
 
   // Initialize from localStorage
   initFromStorage() {
-    const token = localStorage.getItem(this.tokenKey);
+    const token = this.getTokenFromStorage();
     if (token) {
       this.token = token;
       apiClient.setToken(token);
     }
+  }
+
+  // Helper to get token from multiple storage locations
+  getTokenFromStorage() {
+    return localStorage.getItem(this.tokenKey) || localStorage.getItem('token');
   }
 
   // Register a new user
@@ -25,7 +30,7 @@ class AuthService {
       const response = await apiClient.register(userData);
       if (response && response.access_token) {
         this.setToken(response.access_token);
-        this.currentUser = response.user;
+        this.currentUser = response.user || response;
         return response;
       }
     } catch (error) {
@@ -40,7 +45,7 @@ class AuthService {
       const response = await apiClient.login(credentials);
       if (response && response.access_token) {
         this.setToken(response.access_token);
-        this.currentUser = response.user;
+        this.currentUser = response.user || response;
         return response;
       }
     } catch (error) {
@@ -70,7 +75,7 @@ class AuthService {
     } catch (error) {
       console.error('Get profile error:', error);
       // If getting profile fails, clear auth state
-      if (error.message.includes('Unauthorized')) {
+      if (error.message.includes('Unauthorized') || error.message.includes('401')) {
         this.clearAuth();
       }
       throw error;
@@ -82,6 +87,8 @@ class AuthService {
     this.token = token;
     apiClient.setToken(token);
     localStorage.setItem(this.tokenKey, token);
+    // Also store in the other location for compatibility
+    localStorage.setItem('token', token);
   }
 
   // Get current token
@@ -95,11 +102,13 @@ class AuthService {
     this.currentUser = null;
     apiClient.removeToken();
     localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem('token');
   }
 
   // Check if user is authenticated
   isAuthenticated() {
-    return !!this.token;
+    const token = this.getTokenFromStorage();
+    return !!token;
   }
 
   // Get current user
@@ -109,14 +118,15 @@ class AuthService {
 
   // Check if token is expired (basic check, actual validation happens on API calls)
   isTokenExpired() {
-    if (!this.token) {
+    const token = this.getTokenFromStorage();
+    if (!token) {
       return true;
     }
 
     try {
       // Decode the token to check expiration
-      const payload = this.parseJwt(this.token);
-      const currentTime = Date.now() / 1000;
+      const payload = this.parseJwt(token);
+      const currentTime = Math.floor(Date.now() / 1000);
       return payload.exp < currentTime;
     } catch (error) {
       console.error('Error checking token expiration:', error);
