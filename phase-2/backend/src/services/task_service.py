@@ -6,7 +6,7 @@ from ..utils.logging import log_task_event
 
 
 class TaskService:
-    def create_task(self, session: Session, task_create: TaskCreate, user_id: str) -> Task:
+    def create_task(self, session: Session, task_create: TaskCreate, user_id: int) -> Task:
         """
         Create a new task for a user
         """
@@ -17,14 +17,22 @@ class TaskService:
         session.add(db_task)
         session.commit()
         session.refresh(db_task)
-        log_task_event("task_created", user_id=user_id, task_id=db_task.id, success=True)
+        log_task_event("task_created", user_id=user_id, task_id=str(db_task.id), success=True)
         return db_task
 
-    def get_task_by_id(self, session: Session, task_id: str, user_id: str) -> Optional[Task]:
+    def get_task_by_id(self, session: Session, task_id: str, user_id: int) -> Optional[Task]:
         """
         Get a task by ID for a specific user
         """
-        statement = select(Task).where(Task.id == task_id, Task.user_id == user_id)
+        from uuid import UUID
+        try:
+            uuid_task_id = UUID(task_id)
+        except ValueError:
+            # Invalid UUID format
+            log_task_event("task_not_found", user_id=user_id, task_id=task_id, success=False, details={"reason": "invalid_uuid"})
+            return None
+
+        statement = select(Task).where(Task.id == uuid_task_id, Task.user_id == user_id)
         task = session.exec(statement).first()
         if task:
             log_task_event("task_retrieved", user_id=user_id, task_id=task_id, success=True)
@@ -32,7 +40,7 @@ class TaskService:
             log_task_event("task_not_found", user_id=user_id, task_id=task_id, success=False)
         return task
 
-    def list_tasks(self, session: Session, user_id: str, offset: int = 0, limit: int = 100) -> List[Task]:
+    def list_tasks(self, session: Session, user_id: int, offset: int = 0, limit: int = 100) -> List[Task]:
         """
         List tasks for a specific user with pagination
         """
@@ -41,11 +49,20 @@ class TaskService:
         log_task_event("tasks_listed", user_id=user_id, success=True, details={"count": len(tasks)})
         return tasks
 
-    def update_task(self, session: Session, task_id: str, task_update: TaskUpdate, user_id: str) -> Optional[Task]:
+    def update_task(self, session: Session, task_id: str, task_update: TaskUpdate, user_id: int) -> Optional[Task]:
         """
         Update a task for a specific user
         """
-        db_task = self.get_task_by_id(session, task_id, user_id)
+        from uuid import UUID
+        try:
+            uuid_task_id = UUID(task_id)
+        except ValueError:
+            # Invalid UUID format
+            log_task_event("task_update_failed", user_id=user_id, task_id=task_id, success=False, details={"reason": "invalid_uuid"})
+            return None
+
+        statement = select(Task).where(Task.id == uuid_task_id, Task.user_id == user_id)
+        db_task = session.exec(statement).first()
         if not db_task:
             log_task_event("task_update_failed", user_id=user_id, task_id=task_id, success=False, details={"reason": "task_not_found"})
             return None
@@ -60,11 +77,20 @@ class TaskService:
         log_task_event("task_updated", user_id=user_id, task_id=task_id, success=True)
         return db_task
 
-    def delete_task(self, session: Session, task_id: str, user_id: str) -> bool:
+    def delete_task(self, session: Session, task_id: str, user_id: int) -> bool:
         """
         Delete a task for a specific user
         """
-        db_task = self.get_task_by_id(session, task_id, user_id)
+        from uuid import UUID
+        try:
+            uuid_task_id = UUID(task_id)
+        except ValueError:
+            # Invalid UUID format
+            log_task_event("task_delete_failed", user_id=user_id, task_id=task_id, success=False, details={"reason": "invalid_uuid"})
+            return False
+
+        statement = select(Task).where(Task.id == uuid_task_id, Task.user_id == user_id)
+        db_task = session.exec(statement).first()
         if not db_task:
             log_task_event("task_delete_failed", user_id=user_id, task_id=task_id, success=False, details={"reason": "task_not_found"})
             return False
@@ -74,7 +100,7 @@ class TaskService:
         log_task_event("task_deleted", user_id=user_id, task_id=task_id, success=True)
         return True
 
-    def get_user_tasks_count(self, session: Session, user_id: str) -> int:
+    def get_user_tasks_count(self, session: Session, user_id: int) -> int:
         """
         Get the count of tasks for a specific user
         """
