@@ -61,7 +61,10 @@
       "Bash(ls -la frontend/src/middleware*)",
       "Bash(dir *.env* /s)",
       "Bash(dir *.env*)",
-      "Bash(powershell -Command \"Get-ChildItem -Path . -Filter ''*.env*'' -Recurse\")"
+      "Bash(powershell -Command \"Get-ChildItem -Path . -Filter ''*.env*'' -Recurse\")",
+      "Bash(dir frontend /s)",
+      "Bash(powershell -Command \"Get-ChildItem -Path frontend -Recurse -Name\")",
+      "Bash(powershell -Command \"Get-ChildItem -Path frontend -Name | Where-Object { $_-like ''*tailwind*'' }\")"
     ]
   }
 }
