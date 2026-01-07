@@ -34,6 +34,7 @@ export default function HomePage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Todo App</CardTitle>
+          
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-center text-gray-600">
