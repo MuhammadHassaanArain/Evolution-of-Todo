@@ -95,7 +95,7 @@ export const CardTitle: React.FC<CardTitleProps> = ({
   className,
   ...props
 }) => {
-  const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements
+  const HeadingTag = `h${level}` as 'h2' | 'h3' | 'h4' | 'h5'
 
   return (
     <HeadingTag

@@ -157,7 +157,7 @@ interface FormFieldProps {
 }
 
 export const FormField: React.FC<FormFieldProps> = ({ name, label, required, helperText, validate, children }) => {
-  const { formData, errors, touched, setFormData, setTouched, validateField } = useForm()
+  const { formData, errors, touched, setFormData, setTouched, setErrors, validateField } = useForm()
 
   const handleChange = (value: any) => {
     setFormData(prev => ({ ...prev, [name]: value }))
@@ -165,7 +165,15 @@ export const FormField: React.FC<FormFieldProps> = ({ name, label, required, hel
     // Validate field on change if validation function is provided
     if (validate) {
       const error = validate(value)
-      setErrors(prev => ({ ...prev, [name]: error }))
+      if (error) {
+        setErrors(prev => ({ ...prev, [name]: error }))
+      } else {
+        setErrors(prev => {
+          const newErrors = { ...prev }
+          delete newErrors[name]
+          return newErrors
+        })
+      }
     } else if (validateField) {
       validateField(name, value)
     }
@@ -213,7 +221,7 @@ export const FormInput: React.FC<FormInputProps> = ({ name, label, type = 'text'
           value={value || ''}
           onChange={(e) => onChange(e.target.value)}
           onBlur={onBlur}
-          error={touched && error}
+          error={touched ? error : undefined}
           required={required}
         />
       )}
@@ -245,7 +253,7 @@ export const FormTextarea: React.FC<FormTextareaProps> = ({ name, label, placeho
           value={value || ''}
           onChange={(e) => onChange(e.target.value)}
           onBlur={onBlur}
-          error={touched && error}
+          error={touched ? error : undefined}
           required={required}
         />
       )}

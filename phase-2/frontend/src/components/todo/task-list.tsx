@@ -231,10 +231,10 @@ export const TaskListGroup: React.FC<TaskListGroupProps> = ({
             title={task.title}
             description={task.description}
             completed={task.completed}
-            createdAt={task.createdAt}
-            updatedAt={task.updatedAt}
+            created_at={task.created_at}
+            updated_at={task.updated_at}
             priority={task.priority}
-            dueDate={task.dueDate}
+            due_date={task.due_date}
             onToggle={() => onToggleTask?.(task.id)}
             onEdit={() => onEditTask?.(task.id)}
             onDelete={() => onDeleteTask?.(task.id)}

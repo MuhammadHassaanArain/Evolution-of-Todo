@@ -26,7 +26,7 @@ export const TaskForm: React.FC<TaskFormProps> = React.memo(({
   initialValues = {
     title: '',
     description: '',
-    priority: 'medium',
+    priority: 'medium' as const,
     dueDate: ''
   },
   onSubmit,
@@ -130,7 +130,7 @@ export const TaskForm: React.FC<TaskFormProps> = React.memo(({
           setFormData({
             title: '',
             description: '',
-            priority: 'medium',
+            priority: 'medium' as const,
             dueDate: ''
           })
         }
