@@ -7,7 +7,7 @@ import { apiClient } from '../lib/api/client';
  */
 export const register = async (credentials: RegisterCredentials): Promise<AuthResponse> => {
   // Registration doesn't require auth, so we set requiresAuth to false
-  const response = await apiClient.post('/auth/register', credentials, { requiresAuth: false });
+  const response = await apiClient.post<AuthResponse>('/auth/register', credentials, { requiresAuth: false });
 
   // Store the token in localStorage and cookies
   if (response.access_token) {
@@ -16,7 +16,7 @@ export const register = async (credentials: RegisterCredentials): Promise<AuthRe
     document.cookie = `access_token=${response.access_token}; path=/; max-age=3600; SameSite=Lax;`;
   }
 
-  return response as AuthResponse;
+  return response;
 };
 
 /**
@@ -24,7 +24,7 @@ export const register = async (credentials: RegisterCredentials): Promise<AuthRe
  */
 export const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
   // Login doesn't require auth, so we set requiresAuth to false
-  const response = await apiClient.post('/auth/login', credentials, { requiresAuth: false });
+  const response = await apiClient.post<AuthResponse>('/auth/login', credentials, { requiresAuth: false });
 
   // Store the token in localStorage and cookies
   if (response.access_token) {
@@ -33,7 +33,7 @@ export const login = async (credentials: LoginCredentials): Promise<AuthResponse
     document.cookie = `access_token=${response.access_token}; path=/; max-age=3600; SameSite=Lax;`;
   }
 
-  return response as AuthResponse;
+  return response;
 };
 
 /**
@@ -71,9 +71,9 @@ export const getCurrentUser = async (): Promise<AuthUser> => {
   }
 
   // Use the apiClient to ensure proper URL construction and headers
-  const response = await apiClient.get('/auth/me', { requiresAuth: true });
+  const response = await apiClient.get<AuthUser>('/auth/me', { requiresAuth: true });
 
-  return response as AuthUser;
+  return response;
 };
 
 /**

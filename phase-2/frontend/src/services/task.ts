@@ -40,7 +40,7 @@ export const taskService = {
   // Get all tasks for the current user
   async getTasks(): Promise<Task[]> {
     try {
-      const response = await apiClient.get('/tasks');
+      const response = await apiClient.get<any>('/tasks');
       // Handle different possible response formats from backend
       const tasksData = Array.isArray(response) ? response : response.tasks || response.data || [];
       return tasksData.map(transformTaskFromBackend);
@@ -53,7 +53,7 @@ export const taskService = {
   // Get a single task by ID
   async getTask(id: string | number): Promise<Task> {
     try {
-      const response = await apiClient.get(`/tasks/${id}`);
+      const response = await apiClient.get<any>(`/tasks/${id}`);
       return transformTaskFromBackend(response);
     } catch (error) {
       console.error(`Error fetching task ${id}:`, error);
@@ -65,7 +65,7 @@ export const taskService = {
   async createTask(taskData: Partial<Task>): Promise<Task> {
     try {
       const backendData = transformTaskToBackend(taskData);
-      const response = await apiClient.post('/tasks', backendData);
+      const response = await apiClient.post<any>('/tasks', backendData);
       return transformTaskFromBackend(response);
     } catch (error) {
       console.error('Error creating task:', error);
@@ -77,7 +77,7 @@ export const taskService = {
   async updateTask(id: string | number, taskData: Partial<Task>): Promise<Task> {
     try {
       const backendData = transformTaskToBackend(taskData);
-      const response = await apiClient.put(`/tasks/${id}`, backendData);
+      const response = await apiClient.put<any>(`/tasks/${id}`, backendData);
       return transformTaskFromBackend(response);
     } catch (error) {
       console.error(`Error updating task ${id}:`, error);
@@ -88,7 +88,7 @@ export const taskService = {
   // Delete a task
   async deleteTask(id: string | number): Promise<void> {
     try {
-      await apiClient.delete(`/tasks/${id}`);
+      await apiClient.delete<any>(`/tasks/${id}`);
     } catch (error) {
       console.error(`Error deleting task ${id}:`, error);
       throw error;
