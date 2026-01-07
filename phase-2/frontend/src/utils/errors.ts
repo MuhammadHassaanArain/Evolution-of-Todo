@@ -7,6 +7,8 @@ interface ErrorContext {
   action?: string;
   userId?: string;
   timestamp?: string;
+  errorType?: string;
+  [key: string]: any; // Allow additional properties
 }
 
 class ErrorHandler {

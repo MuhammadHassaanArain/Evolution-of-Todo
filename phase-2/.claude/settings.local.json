@@ -64,7 +64,11 @@
       "Bash(powershell -Command \"Get-ChildItem -Path . -Filter ''*.env*'' -Recurse\")",
       "Bash(dir frontend /s)",
       "Bash(powershell -Command \"Get-ChildItem -Path frontend -Recurse -Name\")",
-      "Bash(powershell -Command \"Get-ChildItem -Path frontend -Name | Where-Object { $_-like ''*tailwind*'' }\")"
+      "Bash(powershell -Command \"Get-ChildItem -Path frontend -Name | Where-Object { $_-like ''*tailwind*'' }\")",
+      "Bash(ls -la .specify/scripts/bash/update*)",
+      "Bash(bash .specify/scripts/bash/update-agent-context.sh claude)",
+      "Bash(.specify/scripts/bash/create-phr.sh --title \"ui-redesign-plan\" --stage plan --feature \"ui-redesign\")",
+      "Bash(.specify/scripts/bash/create-phr.sh --title \"ui-redesign-tasks\" --stage tasks --feature \"ui-redesign\")"
     ]
   }
 }
