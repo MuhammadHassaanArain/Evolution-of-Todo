@@ -68,7 +68,11 @@
       "Bash(ls -la .specify/scripts/bash/update*)",
       "Bash(bash .specify/scripts/bash/update-agent-context.sh claude)",
       "Bash(.specify/scripts/bash/create-phr.sh --title \"ui-redesign-plan\" --stage plan --feature \"ui-redesign\")",
-      "Bash(.specify/scripts/bash/create-phr.sh --title \"ui-redesign-tasks\" --stage tasks --feature \"ui-redesign\")"
+      "Bash(.specify/scripts/bash/create-phr.sh --title \"ui-redesign-tasks\" --stage tasks --feature \"ui-redesign\")",
+      "Bash(git rev-parse --git-dir)",
+      "Bash(ls -la \"frontend/src/app/\\(protected\\)/\")",
+      "Bash(npm install @heroicons/react)",
+      "Bash(npm install framer-motion)"
     ]
   }
 }
