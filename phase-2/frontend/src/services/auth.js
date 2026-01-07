@@ -89,6 +89,10 @@ class AuthService {
     localStorage.setItem(this.tokenKey, token);
     // Also store in the other location for compatibility
     localStorage.setItem('token', token);
+    // Also set as a cookie for server-side access
+    if (typeof document !== 'undefined') {
+      document.cookie = `access_token=${token}; path=/; max-age=3600; SameSite=Lax;`;
+    }
   }
 
   // Get current token
@@ -103,6 +107,10 @@ class AuthService {
     apiClient.removeToken();
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem('token');
+    // Also clear the cookie
+    if (typeof document !== 'undefined') {
+      document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
   }
 
   // Check if user is authenticated

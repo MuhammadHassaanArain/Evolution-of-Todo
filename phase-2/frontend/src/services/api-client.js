@@ -17,6 +17,10 @@ class ApiClientWrapper {
     if (token) {
       localStorage.setItem('access_token', token);
       localStorage.setItem('token', token);
+      // Also set as a cookie for server-side access
+      if (typeof document !== 'undefined') {
+        document.cookie = `access_token=${token}; path=/; max-age=3600; SameSite=Lax;`;
+      }
     }
   }
 
@@ -24,6 +28,10 @@ class ApiClientWrapper {
   removeToken() {
     localStorage.removeItem('access_token');
     localStorage.removeItem('token');
+    // Also clear the cookie
+    if (typeof document !== 'undefined') {
+      document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
   }
 
   // Make a request - this should map to the TypeScript client methods
@@ -55,7 +63,7 @@ class ApiClientWrapper {
     // Use the TypeScript client directly for auth methods
     // We'll make the call without auth requirement
     try {
-      const response = await fetch(`${this.tsClient.baseUrl}/auth/register`, {
+      const response = await fetch(`${this.tsClient.baseUrl}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,7 +92,7 @@ class ApiClientWrapper {
   async login(credentials) {
     // Use direct fetch for login to avoid auth requirement
     try {
-      const response = await fetch(`${this.tsClient.baseUrl}/auth/login`, {
+      const response = await fetch(`${this.tsClient.baseUrl}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -115,7 +123,7 @@ class ApiClientWrapper {
     try {
       const token = localStorage.getItem('access_token');
       if (token) {
-        await fetch(`${this.tsClient.baseUrl}/auth/logout`, {
+        await fetch(`${this.tsClient.baseUrl}/api/auth/logout`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,

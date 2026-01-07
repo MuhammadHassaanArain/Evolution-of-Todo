@@ -1,29 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export function middleware(req: NextRequest) {
-  // Get the token from cookies or headers
-  const token = req.cookies.get('token') || req.headers.get('authorization')?.split(' ')[1]
+  // Only check authentication for API routes
+  // For page routes, authentication will be handled client-side by the AuthProvider
+  if (req.nextUrl.pathname.startsWith('/api/')) {
+    // Get the token from cookies or authorization header
+    const token = req.cookies.get('access_token')?.value || req.cookies.get('token')?.value || req.headers.get('authorization')?.split(' ')[1]
 
-  // Define protected routes
-  const protectedPaths = ['/dashboard', '/profile', '/todos']
-  const isProtectedRoute = protectedPaths.some(path => req.nextUrl.pathname.startsWith(path))
+    // Define protected API routes
+    const protectedPaths = ['/api/tasks', '/api/auth/me']
+    const isProtectedRoute = protectedPaths.some(path => req.nextUrl.pathname.startsWith(path))
 
-  // If the route is protected and no token exists, redirect to login
-  if (isProtectedRoute && !token) {
-    return NextResponse.redirect(new URL('/login', req.url))
+    // If the API route is protected and no token exists, return 401
+    if (isProtectedRoute && !token) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+    }
   }
 
-  // If user is trying to access auth pages (login/signup/forgot-password) while authenticated, redirect to dashboard
-  const authPaths = ['/login', '/signup', '/forgot-password']
-  const isAuthRoute = authPaths.some(path => req.nextUrl.pathname.startsWith(path))
-
-  if (isAuthRoute && token) {
-    return NextResponse.redirect(new URL('/dashboard', req.url))
-  }
-
+  // For page routes, we let them pass through and handle auth client-side
+  // The client-side AuthProvider will handle redirecting unauthenticated users
   return NextResponse.next()
 }
 
+// Only run middleware on API routes
 export const config = {
-  matcher: ['/dashboard/:path*', '/profile/:path*', '/todos/:path*', '/login', '/signup', '/forgot-password', '/']
+  matcher: [
+    '/api/:path*'
+  ]
 }
