@@ -246,4 +246,4 @@ export const TaskListGroup: React.FC<TaskListGroupProps> = ({
       </div>
     </div>
   )
-}
+};
