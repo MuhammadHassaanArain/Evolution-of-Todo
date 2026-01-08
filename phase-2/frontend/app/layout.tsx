@@ -1,9 +1,4 @@
 import './globals.css'
-// import '../styles/theme.css'
-// import '../styles/typography.css'
-// import '../styles/spacing.css'
-// import '../styles/elevation.css'
-// import '../styles/animations.css'
 
 
 import type { Metadata } from 'next'
