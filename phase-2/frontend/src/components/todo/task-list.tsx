@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { TaskItem } from './task-item'
 import { EmptyState } from './empty-state'
-import { cn } from '@/lib/utils'
+import { cn } from '../../lib/utils'
 
 export interface Task {
   id: string | number
