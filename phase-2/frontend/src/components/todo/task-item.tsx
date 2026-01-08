@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { Button } from '../ui/button'
-import { cn } from '../../lib/utils'
+import { cn } from '@/lib/utils'
 
 export interface TaskItemProps {
   id: string | number
