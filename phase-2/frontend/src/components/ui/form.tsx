@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react'
 import { Button } from './button'
 import { Input, Textarea } from './input'
-import { cn } from '@/lib/utils'
+import { cn } from '../../lib/utils'
+
 // Form context for sharing form state
 interface FormContextProps {
   formData: Record<string, any>
