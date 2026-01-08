@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { cn } from '../../lib/utils'
+import { cn } from '@/lib/utils'
 import { createFocusTrap, focusFirstElement } from '../../lib/focus'
 
 export interface ModalProps {
