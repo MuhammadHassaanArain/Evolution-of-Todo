@@ -39,8 +39,7 @@ class MessageResponse(BaseModel):
     role: RoleEnum
     content: str
     created_at: str
-
-
+    
 @router.post("/chat", response_model=ChatResponse)
 async def chat(
     request: ChatRequest,
@@ -48,30 +47,22 @@ async def chat(
     db: Session = Depends(get_session)
 ):
     """
-    Process natural language chat message and return AI response with tool execution
+    Process natural language chat message and return AI response
+    using the new Gemini Agent SDK.
     """
-    user_id = str(current_user.id)  # Convert to string to match expected format
+    user_id = str(current_user.id)
 
     # Get or create conversation
     if request.conversation_id:
-        # Get existing conversation
         conversation = conversation_service.get_conversation_by_id(db, request.conversation_id)
         if not conversation:
             raise HTTPException(status_code=404, detail="Conversation not found")
-
-        # Verify that the conversation belongs to the user
         if conversation.user_id != user_id:
             raise HTTPException(status_code=403, detail="Access denied")
-
-        thread_id = conversation.thread_id
     else:
-        # Create new conversation
-        conversation = conversation_service.create_conversation(db, user_id)
-        thread_id = conversation.thread_id
+        conversation = conversation_service.create_conversation(db, user_id, request.message)
 
-    from ...models.message import RoleEnum
-
-    # Add user message to database
+    # Save user message to database
     message_service.create_message(
         db=db,
         user_id=user_id,
@@ -80,20 +71,16 @@ async def chat(
         content=request.message
     )
 
-    # Add user message to OpenAI thread
-    ai_service.add_message_to_thread(thread_id, request.message, "user")
+    # Run the Gemini agent
+    response_text = await ai_service.run_async(request.message)
 
-    # Run the assistant
-    result = ai_service.run_assistant(thread_id, user_id)
-
-    # Add assistant message to database
+    # Save assistant response to database
     message_service.create_message(
         db=db,
         user_id=user_id,
         conversation_id=conversation.id,
         role=RoleEnum.assistant,
-        content=result["response"],
-        tool_calls=json.dumps(result["tool_calls"]) if result["tool_calls"] else None
+        content=response_text
     )
 
     # Update conversation timestamp
@@ -103,9 +90,12 @@ async def chat(
 
     return ChatResponse(
         conversation_id=conversation.id,
-        response=result["response"],
-        tool_calls=result["tool_calls"]
+        response=response_text,
+        tool_calls=[]  # no tool_calls tracking yet for Gemini agent
     )
+
+
+
 
 
 @router.get("/conversations", response_model=list[ConversationsResponse])

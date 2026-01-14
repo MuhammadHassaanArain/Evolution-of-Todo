@@ -11,17 +11,21 @@ class ConversationService:
     Service for managing conversations and messages
     """
 
-    def create_conversation(self, db: Session, user_id: str, thread_id: Optional[str] = None) -> Conversation:
+    def create_conversation(self, db: Session, user_id: str, first_message: Optional[str] = None, thread_id: Optional[str] = None) -> Conversation:
         """
-        Create a new conversation for a user
+        Create a new conversation for a user with an auto-generated title
         """
         if not thread_id:
             # Generate a unique thread ID for OpenAI
             thread_id = f"thread_{uuid.uuid4().hex}"
 
+        # Generate title based on first message or timestamp
+        title = self.generate_conversation_title(first_message)
+
         conversation = Conversation(
             user_id=user_id,
             thread_id=thread_id,
+            title=title,
             created_at=datetime.utcnow(),
             updated_at=datetime.utcnow()
         )
@@ -31,6 +35,22 @@ class ConversationService:
         db.refresh(conversation)
 
         return conversation
+
+    def generate_conversation_title(self, first_message: Optional[str]) -> str:
+        """
+        Generate a conversation title based on the first message or timestamp
+        """
+        if first_message:
+            # Take first 50 characters of the first message
+            title = first_message.strip()[:50]
+            # Add ellipsis if the message was truncated
+            if len(first_message.strip()) > 50:
+                title += "..."
+        else:
+            # Use timestamp if no message is provided
+            title = f"Conversation {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+
+        return title
 
     def get_conversation_by_id(self, db: Session, conversation_id: int) -> Optional[Conversation]:
         """
