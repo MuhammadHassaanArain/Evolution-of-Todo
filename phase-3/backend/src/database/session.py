@@ -1,7 +1,7 @@
 from sqlmodel import Session, create_engine
 from contextlib import contextmanager, AbstractContextManager
 from typing import Generator, Optional
-from ..config import settings
+from ..config.settings import settings
 from ..utils.errors import DatabaseError
 import logging
 
