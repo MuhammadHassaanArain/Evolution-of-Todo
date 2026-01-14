@@ -1,3 +1,4 @@
+'use client';
 import React, { useState } from 'react';
 import { MessageCircle, X } from 'lucide-react';
 import ChatPanel from './ChatPanel';

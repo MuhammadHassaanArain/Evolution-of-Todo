@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useEffect } from 'react';
 import { X, Send, Loader2 } from 'lucide-react';
 import { MessageList } from './MessageList';
