@@ -8,7 +8,7 @@ export function middleware(req: NextRequest) {
     const token = req.cookies.get('access_token')?.value || req.cookies.get('token')?.value || req.headers.get('authorization')?.split(' ')[1]
 
     // Define protected API routes
-    const protectedPaths = ['/api/tasks', '/api/auth/me']
+    const protectedPaths = ['/api/tasks', '/api/auth/me', '/api/chat', '/api/conversations']
     const isProtectedRoute = protectedPaths.some(path => req.nextUrl.pathname.startsWith(path))
 
     // If the API route is protected and no token exists, return 401

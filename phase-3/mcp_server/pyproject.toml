@@ -1,0 +1,13 @@
+[project]
+name = "mcp-server"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aiofiles>=25.1.0",
+    "fastmcp>=2.14.3",
+    "httpx>=0.28.1",
+    "mcp>=1.25.0",
+    "pyjwt>=2.10.1",
+]
