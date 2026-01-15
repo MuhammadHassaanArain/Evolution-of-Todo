@@ -10,11 +10,18 @@ phase-3/env/
 phase-3/backend/.env
 # Python cache
 __pycache__/
+__pycache__*
 *.pyc
 *.pyo
 *.pyd
 .Python
 *.so
+
+# Environment variables
+.env
+.env.*
+!.env.example
+/.ENV
 
 # Distribution artifacts
 .pytest_cache/
