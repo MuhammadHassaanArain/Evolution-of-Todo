@@ -6,7 +6,8 @@ ENV/
 todo_env/
 env.bak/
 venv.bak/
-
+phase-2/env/
+phase-2/backend/.env
 # Python cache
 __pycache__/
 *.pyc
