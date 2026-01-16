@@ -3,15 +3,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session
 from typing import Dict, Any
-from ..dependencies.auth import CurrentUser, get_current_user
-from ..database.session import get_session
-from ..chat.runner import chat_runner
-from ..chat.models import ChatRequest, ChatResponse
-from ..utils.logging import setup_logger
-from ..utils.errors import handle_chat_error
+from ..dependencies.auth import CurrentUser  # Updated import path
+from ..database.session import get_session  # Updated import path
+from ..chat.runner import chat_runner  # Updated import path
+from ..chat.models import ChatRequest, ChatResponse  # Updated import path
+from ..utils.logging import setup_logger  # Updated import path
+from ..utils.errors import handle_chat_error  # Updated import path
 
 
-router = APIRouter(prefix="/api", tags=["chat"])
+router = APIRouter(tags=["chat"])
 logger = setup_logger("chat_endpoint")
 
 

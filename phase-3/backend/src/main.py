@@ -3,8 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.config import settings
 from src.api.auth import router as auth_router
 from src.api.tasks import router as tasks_router
-from src.utils.security import add_security_headers
 from src.database.connection import create_db_and_tables
+from src.api.chat import router as chat_router  # Import the new chat routes
+from src.utils.security import add_security_headers
 
 def create_app() -> FastAPI:
     """
@@ -74,6 +75,7 @@ def create_app() -> FastAPI:
     # Include API routers
     app.include_router(auth_router, prefix=settings.api_prefix, tags=["auth"])
     app.include_router(tasks_router, prefix=settings.api_prefix, tags=["tasks"])
+    app.include_router(chat_router, prefix=settings.api_prefix, tags=["chat"])  # Include chat router
 
     @app.get("/")
     def read_root():

@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     db_echo: bool = os.getenv("DB_ECHO", "False").lower() == "true"
     api_prefix: str = "/api"
     allowed_origins: str = os.getenv("ALLOWED_ORIGINS", "*")
+    next_public_api_url: str | None = None
+    next_public_api_base_url: str | None = None
 
     class Config:
         env_file = ".env"
