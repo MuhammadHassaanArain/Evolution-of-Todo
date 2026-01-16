@@ -17,6 +17,13 @@ class Settings(BaseSettings):
     next_public_api_url: str | None = None
     next_public_api_base_url: str | None = None
 
+    api_key: str = os.getenv("API_KEY", "")
+    model_name: str = os.getenv("MODEL_NAME", "gemini-2.5-flash")
+    mcp_server_url: str = os.getenv("MCP_SERVER_URL", "http://localhost:8001/mcp")
+
+    # Chat settings
+    max_chat_history_tokens: int = int(os.getenv("MAX_CHAT_HISTORY_TOKENS", "4000"))
+
     class Config:
         env_file = ".env"
 
