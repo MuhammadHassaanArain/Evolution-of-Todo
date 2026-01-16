@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(python -c \"\nfrom src.main import app\nprint\\(''Application created successfully''\\)\nprint\\(''App routes:'', [route.path for route in app.routes]\\)\n\")",
-      "Bash(python -c \"\nfrom src.main import app\nprint\\(''Application created successfully''\\)\nprint\\(''App routes:'', [route.path for route in app.routes if ''task'' in route.path.lower\\(\\) or ''todo'' in route.path.lower\\(\\)]\\)\n\")"
-    ]
-  }
-}
