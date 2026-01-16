@@ -1,3 +1,0 @@
-# Project dependencies for Todo CLI Application
-# No external dependencies required - only standard library
-# Project uses UV for package management
