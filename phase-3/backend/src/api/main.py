@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from ..database.connection import create_db_and_tables
-from .routers import todos, chat
+from .routers import todos
 from ..utils.errors import UNAUTHORIZED_RESPONSE, FORBIDDEN_RESPONSE, NOT_FOUND_RESPONSE, BAD_REQUEST_RESPONSE
 
 
@@ -58,19 +58,6 @@ app.include_router(
     todos.router,
     prefix="/api/v1",
     tags=["todos"],
-    responses={
-        401: UNAUTHORIZED_RESPONSE,
-        403: FORBIDDEN_RESPONSE,
-        404: NOT_FOUND_RESPONSE,
-        400: BAD_REQUEST_RESPONSE
-    }
-)
-
-# Include the chat router
-app.include_router(
-    chat.router,
-    prefix="/api/v1",
-    tags=["chat"],
     responses={
         401: UNAUTHORIZED_RESPONSE,
         403: FORBIDDEN_RESPONSE,

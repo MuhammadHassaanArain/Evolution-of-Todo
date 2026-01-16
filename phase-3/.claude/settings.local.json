@@ -72,10 +72,7 @@
       "Bash(git rev-parse --git-dir)",
       "Bash(ls -la \"frontend/src/app/\\(protected\\)/\")",
       "Bash(npm install @heroicons/react)",
-      "Bash(npm install framer-motion)",
-      "Bash(git checkout -b 1-ai-chatbot)",
-      "Bash(git branch -m 1-ai-chatbot 001-ai-chatbot)",
-      "Bash(git branch -m 001-ai-chatbot 1-ai-chatbot)"
+      "Bash(npm install framer-motion)"
     ]
   }
 }
