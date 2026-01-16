@@ -70,6 +70,14 @@ curl -X POST http://localhost:8000/api/chat \
   -d '{"message": "Add a task to buy groceries"}'
 ```
 
+### Security Validation
+
+The chatbot backend ensures proper user isolation by:
+1. Requiring authentication via JWT tokens for all requests
+2. Scoping conversations to the authenticated user via the `user_id` field
+3. Only allowing users to access their own conversations in the database
+4. Using the existing authentication system from the backend API
+
 ## Using the Chat API
 
 ### Starting a New Conversation
