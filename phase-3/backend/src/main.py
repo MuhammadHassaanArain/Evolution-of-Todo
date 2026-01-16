@@ -3,9 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.config import settings
 from src.api.auth import router as auth_router
 from src.api.tasks import router as tasks_router
+from src.database.connection import create_db_and_tables
 from src.api.chat import router as chat_router  # Import the new chat routes
 from src.utils.security import add_security_headers
-from src.database.connection import create_db_and_tables
 
 def create_app() -> FastAPI:
     """

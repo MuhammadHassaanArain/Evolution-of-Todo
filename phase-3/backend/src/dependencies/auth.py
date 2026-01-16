@@ -3,11 +3,10 @@
 from typing import Generator, Optional
 from fastapi import Depends, HTTPException, status, Request
 from sqlmodel import Session
-from backend.database.session import get_session
-from backend.models.user import User  # Assuming user model exists
-from backend.services.auth import verify_token  # Assuming auth service exists
-
-
+from ..database.session import get_session
+from ..models.user import User  # Assuming user model exists
+# from ..services.auth_service import verify_token  # Assuming auth service exists
+from ..services.auth_service import auth_service
 def get_current_user(
     request: Request,
     session: Session = Depends(get_session)
@@ -36,7 +35,7 @@ def get_current_user(
     token = auth_header.split(" ")[1]
 
     try:
-        user_id = verify_token(token)
+        user_id = auth_service.verify_password(token)
         user = session.get(User, user_id)
         if not user:
             raise HTTPException(
