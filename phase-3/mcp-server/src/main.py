@@ -10,7 +10,7 @@ from typing import Dict, Any, Optional, List
 mcp = FastMCP("todo-mcp-server", stateless_http=True)
 
 @mcp.tool(title="Add a new task for the authenticated user.")
-async def add_task(title: str, description: Optional[str] = None) -> Dict[str, Any]:
+async def add_task(title: str, description: Optional[str] = None, auth_token:str=None) -> Dict[str, Any]:
     """
     Create a new task for the authenticated user via backend API.
 
@@ -37,7 +37,10 @@ async def add_task(title: str, description: Optional[str] = None) -> Dict[str, A
     endpoint = f"{base_url}/api/tasks"
 
     # Authentication header
-    headers = {"Authorization": f"Bearer {os.getenv('AUTHORIZATION_TOKEN', '')}"}
+    # headers = {"Authorization": f"Bearer {os.getenv('AUTHORIZATION_TOKEN', '')}"}
+    headers = {}
+    if auth_token:
+        headers["Authorization"] = f"Bearer {auth_token}"
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
@@ -139,7 +142,7 @@ async def list_tasks(status: Optional[str] = "all", auth_token: str = None) -> L
 
 
 @mcp.tool(title="Update an existing task.")
-async def update_task(task_id: int, title: str | None = None, description: str | None = None) -> Dict[str, Any]:
+async def update_task(task_id: str, title: str | None = None, description: str | None = None, auth_token:str=None) -> Dict[str, Any]:
     """
     Update task title or description via backend API.
 
@@ -151,9 +154,14 @@ async def update_task(task_id: int, title: str | None = None, description: str |
     Returns:
         Dictionary with task_id, status, updated title, or error info
     """
-    if not isinstance(task_id, int) or task_id <= 0:
-        return {"error": "validation_error", "message": "Task ID must be a positive integer", "details": f"Invalid task_id: {task_id}"}
-
+    # if not isinstance(task_id, str) or task_id <= 0:
+    #     return {"error": "validation_error", "message": "Task ID must be a positive integer", "details": f"Invalid task_id: {task_id}"}
+    if not isinstance(task_id, str) or not task_id.strip():
+        return {
+            "error": "validation_error",
+            "message": "Task ID must be a non-empty string (UUID)",
+            "details": f"Invalid task_id: {task_id}"
+        }
     if title is None and description is None:
         return {"error": "validation_error", "message": "Provide at least one of title or description", "details": "Both title and description are None"}
 
@@ -170,7 +178,10 @@ async def update_task(task_id: int, title: str | None = None, description: str |
 
     base_url = getattr(settings, "backend_api_url", "http://localhost:8000")
     endpoint = f"{base_url}/api/tasks/{task_id}"
-    headers = {"Authorization": f"Bearer {os.getenv('AUTHORIZATION_TOKEN', '')}"}
+    # headers = {"Authorization": f"Bearer {os.getenv('AUTHORIZATION_TOKEN', '')}"}
+    headers = {}
+    if auth_token:
+        headers["Authorization"] = f"Bearer {auth_token}"
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
@@ -188,7 +199,7 @@ async def update_task(task_id: int, title: str | None = None, description: str |
 
 
 @mcp.tool(title="Mark a task as completed.")
-async def complete_task(task_id: int) -> Dict[str, Any]:
+async def complete_task(task_id: str, auth_token:str=None) -> Dict[str, Any]:
     """
     Mark a task as completed via backend API.
 
@@ -198,12 +209,21 @@ async def complete_task(task_id: int) -> Dict[str, Any]:
     Returns:
         Dictionary with task_id, status, title, or error info
     """
-    if not isinstance(task_id, int) or task_id <= 0:
-        return {"error": "validation_error", "message": "Task ID must be positive", "details": f"Invalid task_id: {task_id}"}
+    if not isinstance(task_id, str) or not task_id.strip():
+        return {
+            "error": "validation_error",
+            "message": "Task ID must be a non-empty string (UUID)",
+            "details": f"Invalid task_id: {task_id}"
+        }
+    # if not isinstance(task_id, int) or task_id <= 0:
+    #     return {"error": "validation_error", "message": "Task ID must be positive", "details": f"Invalid task_id: {task_id}"}
 
     base_url = getattr(settings, "backend_api_url", "http://localhost:8000")
     endpoint = f"{base_url}/api/tasks/{task_id}/complete"
-    headers = {"Authorization": f"Bearer {os.getenv('AUTHORIZATION_TOKEN', '')}"}
+    # headers = {"Authorization": f"Bearer {os.getenv('AUTHORIZATION_TOKEN', '')}"}
+    headers = {}
+    if auth_token:
+        headers["Authorization"] = f"Bearer {auth_token}"
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
@@ -221,7 +241,7 @@ async def complete_task(task_id: int) -> Dict[str, Any]:
 
 
 @mcp.tool(title="Delete a task.")
-async def delete_task(task_id: int) -> Dict[str, Any]:
+async def delete_task(task_id: str, auth_token:str=None) -> Dict[str, Any]:
     """
     Delete a task via backend API.
 
@@ -231,12 +251,22 @@ async def delete_task(task_id: int) -> Dict[str, Any]:
     Returns:
         Dictionary with task_id, status, title, or error info
     """
-    if not isinstance(task_id, int) or task_id <= 0:
-        return {"error": "validation_error", "message": "Task ID must be positive", "details": f"Invalid task_id: {task_id}"}
+    if not isinstance(task_id, str) or not task_id.strip():
+        return {
+            "error": "validation_error",
+            "message": "Task ID must be a non-empty string (UUID)",
+            "details": f"Invalid task_id: {task_id}"
+        }
+    # if not isinstance(task_id, int) or task_id <= 0:
+    #     return {"error": "validation_error", "message": "Task ID must be positive", "details": f"Invalid task_id: {task_id}"}
 
     base_url = getattr(settings, "backend_api_url", "http://localhost:8000")
     endpoint = f"{base_url}/api/tasks/{task_id}"
-    headers = {"Authorization": f"Bearer {os.getenv('AUTHORIZATION_TOKEN', '')}"}
+    # headers = {"Authorization": f"Bearer {os.getenv('AUTHORIZATION_TOKEN', '')}"}
+    headers = {}
+    if auth_token:
+        headers["Authorization"] = f"Bearer {auth_token}"
+
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
