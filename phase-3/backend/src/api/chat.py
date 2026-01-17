@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session
 from typing import Dict, Any
-from ..dependencies.auth import CurrentUser  # Updated import path
+from ..api.auth_dependency import get_current_user
 from ..database.session import get_session  # Updated import path
 from ..chat.runner import execute_chat  # Updated import path
 from ..chat.models import ChatRequest, ChatResponse  # Updated import path
@@ -18,7 +18,7 @@ logger = setup_logger("chat_endpoint")
 @router.post("/chat", response_model=ChatResponse)
 def chat(
     chat_request: ChatRequest,
-    current_user = Depends(CurrentUser),
+    current_user = Depends(get_current_user),
     db_session: Session = Depends(get_session)
 ) -> ChatResponse:
     """

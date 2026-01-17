@@ -79,7 +79,11 @@
       "Bash(../../../.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks)",
       "Bash(./.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks)",
       "Bash(python -m uv run python -c \"from src.main import app; print\\(''Application loaded successfully''\\)\")",
-      "Bash(python -c \"from src.main import app; print\\(''Application loaded successfully''\\)\")"
+      "Bash(python -c \"from src.main import app; print\\(''Application loaded successfully''\\)\")",
+      "Bash(dir src)",
+      "Bash(dir dependencies)",
+      "Bash(find backend/src -name \"*.py\" -exec grep -l \"get_current_user\" {} ;)",
+      "Bash(timeout 10s uvicorn src.main:app --reload)"
     ]
   }
 }
