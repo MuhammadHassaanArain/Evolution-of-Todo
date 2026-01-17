@@ -1,53 +1,259 @@
-# """Main entry point for the MCP Server for Todo Task Management."""
+"""MCP tools for task management operations."""
 
-# import asyncio
-# import os
-# from mcp.server.fastmcp import FastMCP
-# from .config import settings
-
-
-# def create_mcp_server():
-#     """Create and configure the MCP server."""
-#     from .tools import add_task, list_tasks, update_task, complete_task, delete_task
-
-#     mcp = FastMCP(
-#         "todo-mcp-server",
-#         stateless_http=True
-#     )
-
-
-#     return mcp
-
-
-# # Create the global server instance
-# mcp = create_mcp_server()
-
-# # Create the ASGI application
-# app = mcp.streamable_http_app(mcp)
-
-
-# if __name__ == "__main__":
-#     import uvicorn
-
-#     port = int(os.getenv("MCP_SERVER_PORT", settings.mcp_port))
-#     host = os.getenv("MCP_SERVER_HOST", "0.0.0.0")
-
-#     uvicorn.run(
-#         app,
-#         host=host,
-#         port=port,
-#         reload=False  # Disable reload in production
-#     )
-
-
-# main.py
 import os
+import httpx
+from .config import settings 
 from mcp.server.fastmcp import FastMCP
-from .config import settings
+from typing import Dict, Any, Optional, List
+
 
 mcp = FastMCP("todo-mcp-server", stateless_http=True)
 
+@mcp.tool(title="Add a new task for the authenticated user.")
+async def add_task(title: str, description: Optional[str] = None) -> Dict[str, Any]:
+    """
+    Create a new task for the authenticated user via backend API.
+
+    Args:
+        title: Title of the task (required)
+        description: Optional task description
+
+    Returns:
+        Dictionary with task_id, status, title, or error info
+    """
+    # Validate input
+    if not title or not isinstance(title, str) or not title.strip():
+        return {
+            "error": "validation_error",
+            "message": "Title is required and must be a non-empty string",
+            "details": "Parameter 'title' is missing or invalid"
+        }
+
+    payload = {"title": title}
+    if description:
+        payload["description"] = description
+
+    base_url = getattr(settings, "backend_api_url", "http://localhost:8000")
+    endpoint = f"{base_url}/api/tasks"
+
+    # Authentication header
+    headers = {"Authorization": f"Bearer {os.getenv('AUTHORIZATION_TOKEN', '')}"}
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.post(endpoint, json=payload, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+
+            return {
+                "task_id": data.get("id"),
+                "status": "created",
+                "title": data.get("title")
+            }
+
+    except httpx.HTTPStatusError as e:
+        return {
+            "error": "http_error",
+            "message": f"Backend returned status {e.response.status_code}",
+            "details": await e.response.aread() if hasattr(e.response, "aread") else str(e)
+        }
+    except httpx.RequestError as e:
+        return {
+            "error": "request_error",
+            "message": f"Failed to connect to backend: {str(e)}",
+            "details": str(e)
+        }
+    except Exception as e:
+        return {
+            "error": "create_failed",
+            "message": f"Unexpected error creating task: {str(e)}",
+            "details": str(e)
+        }
+
+
+@mcp.tool(title="Retrieve tasks for the authenticated user.")
+async def list_tasks(status: Optional[str] = "all") -> List[Dict[str, Any]]:
+    """
+    Retrieve tasks for the authenticated user via backend API.
+
+    Args:
+        status: Optional filter - 'all', 'pending', or 'completed'. Defaults to 'all'.
+
+    Returns:
+        List of tasks or a single-item list containing error info.
+    """
+    valid_status = ["all", "pending", "completed"]
+    if status not in valid_status:
+        return [{
+            "error": "validation_error",
+            "message": f"Status must be one of {valid_status}",
+            "details": f"Invalid status value: {status}"
+        }]
+
+    base_url = getattr(settings, "backend_api_url", "http://localhost:8000")
+    endpoint = f"{base_url}/api/tasks"
+    if status != "all":
+        endpoint += f"?status={status}"
+
+    headers = {"Authorization": f"Bearer {os.getenv('AUTHORIZATION_TOKEN', '')}"}
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(endpoint, headers=headers)
+            response.raise_for_status()
+            tasks_data = response.json()
+
+            formatted_tasks = []
+            for task in tasks_data:
+                formatted_task = {
+                    "id": task.get("id"),
+                    "title": task.get("title"),
+                    "completed": task.get("completed", False)
+                }
+                if "description" in task:
+                    formatted_task["description"] = task["description"]
+                formatted_tasks.append(formatted_task)
+
+            return formatted_tasks
+
+    except httpx.HTTPStatusError as e:
+        return [{
+            "error": "http_error",
+            "message": f"Backend returned status {e.response.status_code}",
+            "details": await e.response.aread() if hasattr(e.response, "aread") else str(e)
+        }]
+    except httpx.RequestError as e:
+        return [{
+            "error": "request_error",
+            "message": f"Failed to connect to backend: {str(e)}",
+            "details": str(e)
+        }]
+    except Exception as e:
+        return [{
+            "error": "unknown_error",
+            "message": f"Unexpected error: {str(e)}",
+            "details": str(e)
+        }]
+
+
+@mcp.tool(title="Update an existing task.")
+async def update_task(task_id: int, title: str | None = None, description: str | None = None) -> Dict[str, Any]:
+    """
+    Update task title or description via backend API.
+
+    Args:
+        task_id: ID of the task to update (required)
+        title: New title (optional)
+        description: New description (optional)
+
+    Returns:
+        Dictionary with task_id, status, updated title, or error info
+    """
+    if not isinstance(task_id, int) or task_id <= 0:
+        return {"error": "validation_error", "message": "Task ID must be a positive integer", "details": f"Invalid task_id: {task_id}"}
+
+    if title is None and description is None:
+        return {"error": "validation_error", "message": "Provide at least one of title or description", "details": "Both title and description are None"}
+
+    payload = {}
+    if title is not None:
+        if not isinstance(title, str) or not title.strip():
+            return {"error": "validation_error", "message": "Title must be a non-empty string if provided", "details": f"Invalid title: {title}"}
+        payload["title"] = title
+
+    if description is not None:
+        if not isinstance(description, str):
+            return {"error": "validation_error", "message": "Description must be a string if provided", "details": f"Invalid description type: {type(description)}"}
+        payload["description"] = description
+
+    base_url = getattr(settings, "backend_api_url", "http://localhost:8000")
+    endpoint = f"{base_url}/api/tasks/{task_id}"
+    headers = {"Authorization": f"Bearer {os.getenv('AUTHORIZATION_TOKEN', '')}"}
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.put(endpoint, json=payload, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            return {"task_id": task_id, "status": "updated", "title": data.get("title")}
+
+    except httpx.HTTPStatusError as e:
+        return {"error": "http_error", "message": f"Backend returned {e.response.status_code}", "details": await e.response.aread() if hasattr(e.response, "aread") else str(e)}
+    except httpx.RequestError as e:
+        return {"error": "request_error", "message": f"Failed to connect: {str(e)}", "details": str(e)}
+    except Exception as e:
+        return {"error": "update_failed", "message": f"Unexpected error updating task {task_id}: {str(e)}", "details": str(e)}
+
+
+@mcp.tool(title="Mark a task as completed.")
+async def complete_task(task_id: int) -> Dict[str, Any]:
+    """
+    Mark a task as completed via backend API.
+
+    Args:
+        task_id: ID of the task to complete
+
+    Returns:
+        Dictionary with task_id, status, title, or error info
+    """
+    if not isinstance(task_id, int) or task_id <= 0:
+        return {"error": "validation_error", "message": "Task ID must be positive", "details": f"Invalid task_id: {task_id}"}
+
+    base_url = getattr(settings, "backend_api_url", "http://localhost:8000")
+    endpoint = f"{base_url}/api/tasks/{task_id}/complete"
+    headers = {"Authorization": f"Bearer {os.getenv('AUTHORIZATION_TOKEN', '')}"}
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.patch(endpoint, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            return {"task_id": task_id, "status": "completed", "title": data.get("title")}
+
+    except httpx.HTTPStatusError as e:
+        return {"error": "http_error", "message": f"Backend returned {e.response.status_code}", "details": await e.response.aread() if hasattr(e.response, "aread") else str(e)}
+    except httpx.RequestError as e:
+        return {"error": "request_error", "message": f"Failed to connect: {str(e)}", "details": str(e)}
+    except Exception as e:
+        return {"error": "complete_failed", "message": f"Unexpected error completing task {task_id}: {str(e)}", "details": str(e)}
+
+
+@mcp.tool(title="Delete a task.")
+async def delete_task(task_id: int) -> Dict[str, Any]:
+    """
+    Delete a task via backend API.
+
+    Args:
+        task_id: ID of the task to delete
+
+    Returns:
+        Dictionary with task_id, status, title, or error info
+    """
+    if not isinstance(task_id, int) or task_id <= 0:
+        return {"error": "validation_error", "message": "Task ID must be positive", "details": f"Invalid task_id: {task_id}"}
+
+    base_url = getattr(settings, "backend_api_url", "http://localhost:8000")
+    endpoint = f"{base_url}/api/tasks/{task_id}"
+    headers = {"Authorization": f"Bearer {os.getenv('AUTHORIZATION_TOKEN', '')}"}
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.delete(endpoint, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            return {"task_id": task_id, "status": "deleted", "title": data.get("title")}
+
+    except httpx.HTTPStatusError as e:
+        return {"error": "http_error", "message": f"Backend returned {e.response.status_code}", "details": await e.response.aread() if hasattr(e.response, "aread") else str(e)}
+    except httpx.RequestError as e:
+        return {"error": "request_error", "message": f"Failed to connect: {str(e)}", "details": str(e)}
+    except Exception as e:
+        return {"error": "delete_failed", "message": f"Unexpected error deleting task {task_id}: {str(e)}", "details": str(e)}
+
+
 app = mcp.streamable_http_app()
+
+
 
 if __name__ == "__main__":
     import uvicorn
