@@ -16,7 +16,7 @@ logger = setup_logger("chat_endpoint")
 
 
 @router.post("/chat", response_model=ChatResponse)
-def chat(
+async def chat(
     chat_request: ChatRequest,
     current_user = Depends(get_current_user),
     db_session: Session = Depends(get_session)
@@ -44,7 +44,7 @@ def chat(
         chat_request.user_id = current_user.id
 
         # Execute the chat request using the chat runner
-        response = execute_chat.execute_chat(chat_request, db_session)
+        response = await execute_chat(chat_request, db_session)
 
         return response
 
@@ -52,23 +52,24 @@ def chat(
         # Re-raise HTTP exceptions as-is
         raise
     except Exception as e:
-        # Log the error
         logger.error(f"Error in chat endpoint: {str(e)}")
 
-        # Handle the error gracefully
-        error_response = handle_chat_error(
+        error = handle_chat_error(
             e,
-            logger,
             context={
                 "user_id": current_user.id if current_user else None,
                 "conversation_id": chat_request.conversation_id
             }
         )
 
-        # Return a user-friendly error response
+        # If it's already an HTTPException, raise it
+        if isinstance(error, HTTPException):
+            raise error
+
+    # Otherwise fallback safely
         return ChatResponse(
             conversation_id=chat_request.conversation_id or -1,
-            response=error_response.get("message", "Sorry, I encountered an error processing your request."),
+            response="Sorry, I encountered an error processing your request.",
             tool_calls=[]
         )
 

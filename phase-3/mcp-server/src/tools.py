@@ -3,11 +3,11 @@
 import asyncio
 import httpx
 from typing import Dict, Any, Optional
-from mcp import tool
+from .main import mcp
 from .client import backend_client
 
 
-@tool("Add a new task for the authenticated user.")
+@mcp.tool("Add a new task for the authenticated user.")
 async def add_task(title: str, description: Optional[str] = None) -> Dict[str, Any]:
     """
     Create a new task for the authenticated user.
@@ -68,7 +68,7 @@ async def add_task(title: str, description: Optional[str] = None) -> Dict[str, A
         }
 
 
-@tool("Retrieve tasks for the authenticated user.")
+@mcp.tool("Retrieve tasks for the authenticated user.")
 async def list_tasks(status: Optional[str] = None) -> list:
     """
     Retrieve tasks for the authenticated user.
@@ -134,7 +134,7 @@ async def list_tasks(status: Optional[str] = None) -> list:
         }]
 
 
-@tool("Update an existing task.")
+@mcp.tool("Update an existing task.")
 async def update_task(task_id: int, title: Optional[str] = None, description: Optional[str] = None) -> Dict[str, Any]:
     """
     Modify task title or description.
@@ -216,7 +216,7 @@ async def update_task(task_id: int, title: Optional[str] = None, description: Op
         }
 
 
-@tool("Mark a task as completed.")
+@mcp.tool("Mark a task as completed.")
 async def complete_task(task_id: int) -> Dict[str, Any]:
     """
     Mark a task as completed.
@@ -268,7 +268,7 @@ async def complete_task(task_id: int) -> Dict[str, Any]:
         }
 
 
-@tool("Delete a task.")
+@mcp.tool("Delete a task.")
 async def delete_task(task_id: int) -> Dict[str, Any]:
     """
     Delete a task.
