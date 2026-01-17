@@ -4,8 +4,7 @@ from typing import Optional
 from mcp import ClientSession
 from contextlib import AsyncExitStack
 from mcp.client.streamable_http import streamable_http_client
-from mcp.types import( ListToolsResult, CallToolResult, ListResourcesResult, 
-ListResourceTemplatesResult, ReadResourceResult, ListPromptsResult,  GetPromptResult)
+from mcp.types import( ListToolsResult, CallToolResult)
 
 class MCPClient:
     def __init__(self, server_url):
@@ -50,12 +49,26 @@ class MCPClient:
 async def main():
     async with MCPClient("http://localhost:8001/mcp") as client:
         print("-"*100)
+        auth_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzY4NjU2MDg1fQ.yvyudhOvLROpsTheIPlVPgEI6nChYRUXYCZmujGFZSU"
         tool_list = await client.tool_list()
-        print(tool_list[1].name)
+        for tool in tool_list:
+            print(tool.name)
     
-        list_tasks = await client.tool_call("list_tasks", arguments={"status":"all", "auth_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzY4NjUyMTc1fQ.i9bOgqj2DYkrugkdjC0UbTx2cF52uFEKmarAW8t7P4w"})
+        list_tasks = await client.tool_call("list_tasks", arguments={"status":"all", "auth_token":auth_token})
         for tasks in list_tasks:
             print(tasks.text, "/n")
-        
 
+        post_task = await client.tool_call("add_task", arguments={"title":"MCP Testing Adding", "description":"Testting mcp tool by posting Tasks", "auth_token":auth_token})
+        print(post_task)
+
+        update_task = await client.tool_call("update_task", arguments={"task_id":"668f9e1c-e36b-4552-9084-fae98dc9de75","title":"change to Hello", "description":"Testting mcp tool by posting Tasks", "auth_token":auth_token})
+        print(update_task)
+
+        complete_task = await client.tool_call("complete_task", arguments={"task_id":"668f9e1c-e36b-4552-9084-fae98dc9de75", "auth_token":auth_token})
+        print(complete_task)
+
+        delete_task = await client.tool_call("delete_task", arguments={"task_id":"07f70962-2763-4f48-b81c-b744e7016595", "auth_token":auth_token})
+        print(delete_task)
+        
+        
 asyncio.run(main())
