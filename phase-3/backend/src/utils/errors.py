@@ -104,6 +104,44 @@ def create_http_exception(
         detail=detail,
         headers=headers
     )
+def handle_chat_error(error: Exception, context: str = "chat"):
+    """
+    Handle errors coming from chat / agent execution
+    and convert them into proper HTTPExceptions.
+    """
+    logger.error(f"Chat error in {context}: {str(error)}")
+    logger.error(traceback.format_exc())
+
+    # Validation / user input issues
+    if isinstance(error, ValidationError):
+        return handle_bad_request_error(error.message)
+
+    # Database-related issues
+    if isinstance(error, DatabaseError):
+        return create_http_exception(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database operation failed",
+            error_code=error.error_code or "DB_ERROR",
+        )
+
+    # Unauthorized access
+    if isinstance(error, UnauthorizedError):
+        return handle_unauthorized_error(error.message)
+
+    # Forbidden access
+    if isinstance(error, ForbiddenError):
+        return handle_forbidden_error(error.message)
+
+    # Resource not found
+    if isinstance(error, NotFoundError):
+        return handle_not_found_error("Resource", "unknown")
+
+    # FastAPI HTTPExceptions → re-raise as-is
+    if isinstance(error, HTTPException):
+        return error
+
+    # Fallback: internal server error
+    return handle_internal_error(error, context=context)
 
 
 def create_error_response(

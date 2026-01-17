@@ -49,5 +49,3 @@ def get_current_user(
             detail=f"Could not validate credentials: {str(e)}",
         )
 
-
-CurrentUser = Depends(get_current_user)

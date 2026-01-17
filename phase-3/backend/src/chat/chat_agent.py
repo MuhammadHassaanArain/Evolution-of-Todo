@@ -1,9 +1,9 @@
 import os
 from typing import List, Dict, Any, Optional
 from dotenv import load_dotenv
-
+from openai import AsyncOpenAI
 # Note: Replace 'agents' imports with the standard OpenAI SDK if you can't install Agent SDK
-from agents import Agent, Runner, AsyncOpenAI, OpenAIChatCompletionsModel, RunConfig, ModelSettings
+from agents import Agent, Runner ,OpenAIChatCompletionsModel, RunConfig, ModelSettings
 from agents.mcp import MCPServerStreamableHttp, MCPServerStreamableHttpParams
 
 from .models import ChatRequest, ChatResponse, ToolCall
