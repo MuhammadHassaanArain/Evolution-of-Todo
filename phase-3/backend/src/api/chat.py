@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session
 from typing import Dict, Any
-from ..dependencies.auth import get_current_user  # Updated import path
+from ..api.auth_dependency import get_current_user
 from ..database.session import get_session  # Updated import path
 from ..chat.runner import execute_chat  # Updated import path
 from ..chat.models import ChatRequest, ChatResponse  # Updated import path
