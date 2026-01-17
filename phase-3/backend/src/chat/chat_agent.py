@@ -6,12 +6,12 @@ from openai import AsyncOpenAI
 from agents import Agent, Runner ,OpenAIChatCompletionsModel, RunConfig, ModelSettings
 from agents.mcp import MCPServerStreamableHttp, MCPServerStreamableHttpParams
 
-from .models import ChatRequest, ChatResponse, ToolCall
+# from .models import ChatRequest, ChatResponse, ToolCall
 
 load_dotenv()
 API_KEY = os.getenv("API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME", "gemini-2.5-flash")
-MCP_URL = os.getenv("MCP_SERVER_URL", "http://localhost:8000/mcp/")
+MCP_URL = os.getenv("MCP_SERVER_URL", "http://localhost:8001/mcp/")
 
 # Initialize OpenAI client
 client = AsyncOpenAI(

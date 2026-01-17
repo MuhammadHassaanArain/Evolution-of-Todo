@@ -1,7 +1,9 @@
 from .chat_agent import run_agent
 from .models import ChatRequest, ChatResponse
+from sqlmodel import Session
 
-async def execute_chat(chat_request: ChatRequest) -> ChatResponse:
+
+async def execute_chat(chat_request: ChatRequest, db_session: Session) -> ChatResponse:
     """
     Simplified runner for OpenAI Agent SDK.
 
