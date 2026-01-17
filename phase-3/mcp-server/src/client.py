@@ -52,10 +52,10 @@ async def main():
         print("-"*100)
         tool_list = await client.tool_list()
         print(tool_list[1].name)
-        # for tool in tool_list:
-        #     print(tool.name)
-        list_tasks = await client.tool_call("list_tasks", arguments={"status":"all"})
-        print(list_tasks)
+    
+        list_tasks = await client.tool_call("list_tasks", arguments={"status":"all", "auth_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzY4NjUyMTc1fQ.i9bOgqj2DYkrugkdjC0UbTx2cF52uFEKmarAW8t7P4w"})
+        for tasks in list_tasks:
+            print(tasks.text, "/n")
         
 
 asyncio.run(main())

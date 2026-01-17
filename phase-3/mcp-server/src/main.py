@@ -72,7 +72,7 @@ async def add_task(title: str, description: Optional[str] = None) -> Dict[str, A
 
 
 @mcp.tool(title="Retrieve tasks for the authenticated user.")
-async def list_tasks(status: Optional[str] = "all") -> List[Dict[str, Any]]:
+async def list_tasks(status: Optional[str] = "all", auth_token: str = None) -> List[Dict[str, Any]]:
     """
     Retrieve tasks for the authenticated user via backend API.
 
@@ -95,8 +95,10 @@ async def list_tasks(status: Optional[str] = "all") -> List[Dict[str, Any]]:
     if status != "all":
         endpoint += f"?status={status}"
 
-    headers = {"Authorization": f"Bearer {os.getenv('AUTHORIZATION_TOKEN', '')}"}
-
+    # headers = {"Authorization": f"Bearer {os.getenv('AUTHORIZATION_TOKEN', '')}"}
+    headers = {}
+    if auth_token:
+        headers["Authorization"] = f"Bearer {auth_token}"
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get(endpoint, headers=headers)
