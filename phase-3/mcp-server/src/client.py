@@ -49,7 +49,8 @@ class MCPClient:
 async def main():
     async with MCPClient("http://localhost:8001/mcp") as client:
         print("-"*100)
-        auth_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzY4NjU2MDg1fQ.yvyudhOvLROpsTheIPlVPgEI6nChYRUXYCZmujGFZSU"
+        auth_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNzY4NzI2MTcyfQ._7ntnVJDJO1MwRjtTVUUN5fw1yBjKQRm4Sh4SFDuAQM"
+        
         tool_list = await client.tool_list()
         for tool in tool_list:
             print(tool.name)
@@ -64,7 +65,7 @@ async def main():
         update_task = await client.tool_call("update_task", arguments={"task_id":"668f9e1c-e36b-4552-9084-fae98dc9de75","title":"change to Hello", "description":"Testting mcp tool by posting Tasks", "auth_token":auth_token})
         print(update_task)
 
-        complete_task = await client.tool_call("complete_task", arguments={"task_id":"668f9e1c-e36b-4552-9084-fae98dc9de75", "auth_token":auth_token})
+        complete_task = await client.tool_call("complete_task", arguments={"task_id":"49796900-7a5e-4414-bb73-15e9b346d000", "auth_token":auth_token})
         print(complete_task)
 
         delete_task = await client.tool_call("delete_task", arguments={"task_id":"07f70962-2763-4f48-b81c-b744e7016595", "auth_token":auth_token})
