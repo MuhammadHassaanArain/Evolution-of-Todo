@@ -2,7 +2,7 @@
 name = "mcp-server"
 version = "0.1.0"
 description = "MCP Server for Todo Task Management"
-authors = [{name = "Developer", email = "dev@example.com"}]
+authors = [{name = "M.Hassaan Arain", email = "hassaanarain008@gmail.com"}]
 dependencies = [
     "fastmcp>=0.1.0",
     "httpx>=0.25.0",
