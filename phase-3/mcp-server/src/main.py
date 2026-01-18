@@ -113,7 +113,7 @@ async def list_tasks(status: Optional[str] = "all", auth_token: str = None) -> L
                 formatted_task = {
                     "id": task.get("id"),
                     "title": task.get("title"),
-                    "completed": task.get("completed", False)
+                    "completed": task.get("is_completed", False)
                 }
                 if "description" in task:
                     formatted_task["description"] = task["description"]
