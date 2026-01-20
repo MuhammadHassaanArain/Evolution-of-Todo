@@ -33,19 +33,53 @@ export const useChat = () => {
 
   const loadConversationMessages = async (id: number) => {
     try {
-      const response = await fetch(`/api/conversations/${id}/messages`);
-      if (response.ok) {
-        const data = await response.json();
-        // Transform API response to match our Message interface
-        const transformedMessages: Message[] = data.map((msg: any) => ({
-          id: msg.id,
-          role: msg.role,
-          content: msg.content,
-          createdAt: msg.created_at
-        }));
-        setMessages(transformedMessages);
+      // Get the authentication token from localStorage
+      const token = localStorage.getItem('access_token') || localStorage.getItem('token');
+
+      const response = await fetch(`/api/conversations/${id}/messages`, {
+        headers: {
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        }
+      });
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          // Clear any invalid tokens and redirect to login
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('token');
+
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+          }
+          throw new Error(`Authentication error: ${response.status}`);
+        } else {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      }
+
+      const data = await response.json();
+      // Transform API response to match our Message interface
+      const transformedMessages: Message[] = data.map((msg: any) => ({
+        id: msg.id,
+        role: msg.role,
+        content: msg.content,
+        createdAt: msg.created_at
+      }));
+      setMessages(transformedMessages);
+    } catch (error: any) {
+      console.error('Error loading conversation messages:', error);
+
+      if (error.message && (error.message.includes('401') || error.message.includes('Authentication error'))) {
+        // Add authentication error message
+        setMessages([
+          {
+            id: 1,
+            role: 'assistant',
+            content: 'Your session has expired. Please log in again.',
+            createdAt: new Date().toISOString(),
+          }
+        ]);
       } else {
-        console.error('Failed to load conversation messages');
         // Show initial welcome message
         setMessages([
           {
@@ -56,17 +90,6 @@ export const useChat = () => {
           }
         ]);
       }
-    } catch (error) {
-      console.error('Error loading conversation messages:', error);
-      // Show initial welcome message
-      setMessages([
-        {
-          id: 1,
-          role: 'assistant',
-          content: 'Hello! I\'m your todo assistant. How can I help you today?',
-          createdAt: new Date().toISOString(),
-        }
-      ]);
     }
   };
 
@@ -87,20 +110,29 @@ export const useChat = () => {
     setInput('');
 
     try {
+      // Get the authentication token from localStorage
+      const token = localStorage.getItem('access_token') || localStorage.getItem('token');
+
       // Call the chat API
-      const response = await fetch('/api/chat', {
+      const response = await fetch( `${process.env.NEXT_PUBLIC_API_URL}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
         },
         body: JSON.stringify({
           conversation_id: conversationId,
           message: messageToSend,
         }),
+        
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        if (response.status === 401 || response.status === 403) {
+          throw new Error(`Authentication error: ${response.status}`);
+        } else {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
       }
 
       const data = await response.json();
@@ -119,18 +151,40 @@ export const useChat = () => {
       };
 
       setMessages(prev => [...prev, assistantMessage]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending message:', error);
 
-      // Add error message to the list
-      const errorMessage: Message = {
-        id: Date.now() + 1,
-        role: 'assistant',
-        content: 'Sorry, I encountered an error. Please try again.',
-        createdAt: new Date().toISOString(),
-      };
+      // Handle specific authentication errors
+      if (error.message && (error.message.includes('401') || error.message.includes('Unauthorized'))) {
+        // Clear any invalid tokens and redirect to login
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('token');
 
-      setMessages(prev => [...prev, errorMessage]);
+        // Redirect to login page
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
+
+        // Add authentication error message
+        const errorMessage: Message = {
+          id: Date.now() + 1,
+          role: 'assistant',
+          content: 'Your session has expired. Please log in again.',
+          createdAt: new Date().toISOString(),
+        };
+
+        setMessages(prev => [...prev, errorMessage]);
+      } else {
+        // Add generic error message to the list
+        const errorMessage: Message = {
+          id: Date.now() + 1,
+          role: 'assistant',
+          content: 'Sorry, I encountered an error. Please try again.',
+          createdAt: new Date().toISOString(),
+        };
+
+        setMessages(prev => [...prev, errorMessage]);
+      }
     } finally {
       setIsLoading(false);
     }
