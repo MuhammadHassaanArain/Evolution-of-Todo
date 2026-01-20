@@ -1,7 +1,7 @@
-import os
 from typing import List, Dict, Any, Optional
 from dotenv import load_dotenv
 from openai import AsyncOpenAI
+import os
 # Note: Replace 'agents' imports with the standard OpenAI SDK if you can't install Agent SDK
 from agents import Agent, Runner ,OpenAIChatCompletionsModel, RunConfig, ModelSettings
 from agents.mcp import MCPServerStreamableHttp, MCPServerStreamableHttpParams
@@ -52,10 +52,11 @@ async def run_agent(
         Dict containing 'response', 'tool_calls', 'tool_responses'
     """
     # Setup MCP server with headers if auth header is provided
+    # This should make the headers available to the tools through the MCP protocol
     if auth_header:
         mcp_params = MCPServerStreamableHttpParams(
             url=MCP_URL,
-            headers={"Authorization": auth_header}  # Forward the auth header
+            headers={"Authorization": auth_header}
         )
     else:
         mcp_params = MCPServerStreamableHttpParams(url=MCP_URL)

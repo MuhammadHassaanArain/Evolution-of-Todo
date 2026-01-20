@@ -42,7 +42,12 @@ async def add_task(title: str, description: Optional[str] = None, ctx: Context =
     if ctx and hasattr(ctx, 'request') and hasattr(ctx.request, 'headers'):
         auth_header = ctx.request.headers.get("authorization")
         if auth_header:
-            headers["Authorization"] = auth_header
+            # Ensure the header is in the correct format "Bearer <token>"
+            if auth_header.startswith("Bearer ") or auth_header.startswith("bearer "):
+                headers["Authorization"] = auth_header
+            else:
+                # If it's just the token, add the Bearer prefix
+                headers["Authorization"] = f"Bearer {auth_header}"
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
@@ -106,7 +111,12 @@ async def list_tasks(status: Optional[str] = "all", ctx: Context = None) -> List
     if ctx and hasattr(ctx, 'request') and hasattr(ctx.request, 'headers'):
         auth_header = ctx.request.headers.get("authorization")
         if auth_header:
-            headers["Authorization"] = auth_header
+            # Ensure the header is in the correct format "Bearer <token>"
+            if auth_header.startswith("Bearer ") or auth_header.startswith("bearer "):
+                headers["Authorization"] = auth_header
+            else:
+                # If it's just the token, add the Bearer prefix
+                headers["Authorization"] = f"Bearer {auth_header}"
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
@@ -191,7 +201,12 @@ async def update_task(task_id: str, title: str | None = None, description: str |
     if ctx and hasattr(ctx, 'request') and hasattr(ctx.request, 'headers'):
         auth_header = ctx.request.headers.get("authorization")
         if auth_header:
-            headers["Authorization"] = auth_header
+            # Ensure the header is in the correct format "Bearer <token>"
+            if auth_header.startswith("Bearer ") or auth_header.startswith("bearer "):
+                headers["Authorization"] = auth_header
+            else:
+                # If it's just the token, add the Bearer prefix
+                headers["Authorization"] = f"Bearer {auth_header}"
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
@@ -237,7 +252,12 @@ async def complete_task(task_id: str, ctx: Context = None) -> Dict[str, Any]:
     if ctx and hasattr(ctx, 'request') and hasattr(ctx.request, 'headers'):
         auth_header = ctx.request.headers.get("authorization")
         if auth_header:
-            headers["Authorization"] = auth_header
+            # Ensure the header is in the correct format "Bearer <token>"
+            if auth_header.startswith("Bearer ") or auth_header.startswith("bearer "):
+                headers["Authorization"] = auth_header
+            else:
+                # If it's just the token, add the Bearer prefix
+                headers["Authorization"] = f"Bearer {auth_header}"
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
@@ -283,7 +303,12 @@ async def delete_task(task_id: str, ctx: Context = None) -> Dict[str, Any]:
     if ctx and hasattr(ctx, 'request') and hasattr(ctx.request, 'headers'):
         auth_header = ctx.request.headers.get("authorization")
         if auth_header:
-            headers["Authorization"] = auth_header
+            # Ensure the header is in the correct format "Bearer <token>"
+            if auth_header.startswith("Bearer ") or auth_header.startswith("bearer "):
+                headers["Authorization"] = auth_header
+            else:
+                # If it's just the token, add the Bearer prefix
+                headers["Authorization"] = f"Bearer {auth_header}"
 
 
     try:
