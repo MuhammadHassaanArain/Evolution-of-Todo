@@ -4,7 +4,6 @@ from ..models.task import Task, TaskCreate, TaskUpdate, TaskRead
 from ..models.user import User
 from ..utils.logging import log_task_event
 
-
 class TaskService:
     def create_task(self, session: Session, task_create: TaskCreate, user_id: int) -> Task:
         """
