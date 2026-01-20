@@ -1,6 +1,7 @@
 """Chat endpoint for the chatbot backend."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlmodel import Session
 from typing import Dict, Any
 from ..api.auth_dependency import get_current_user
@@ -17,6 +18,7 @@ logger = setup_logger("chat_endpoint")
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat(
+    request: Request,
     chat_request: ChatRequest,
     current_user = Depends(get_current_user),
     db_session: Session = Depends(get_session)
@@ -25,6 +27,7 @@ async def chat(
     Main chat endpoint that processes user messages and returns AI-generated responses.
 
     Args:
+        request: The HTTP request object to extract headers
         chat_request: The incoming chat request with message and optional conversation ID
         current_user: The authenticated user making the request
         db_session: Database session for persistence
@@ -43,8 +46,11 @@ async def chat(
         # Set the user ID from the authenticated user
         chat_request.user_id = current_user.id
 
-        # Execute the chat request using the chat runner
-        response = await execute_chat(chat_request, db_session)
+        # Extract the raw Authorization header exactly as received
+        auth_header = request.headers.get("authorization")
+
+        # Execute the chat request using the chat runner with the auth header
+        response = await execute_chat(chat_request, db_session, auth_header=auth_header)
 
         return response
 

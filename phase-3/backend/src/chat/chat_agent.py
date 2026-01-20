@@ -35,7 +35,9 @@ config = RunConfig(
 
 async def run_agent(
     user_input: str,
-    conversation_context: Optional[List[Dict[str, str]]] = None
+    conversation_context: Optional[List[Dict[str, str]]] = None,
+    user_id: Optional[int] = None,
+    auth_header: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Run the chatbot agent with MCP tools.
@@ -43,12 +45,21 @@ async def run_agent(
     Args:
         user_input: The user's message
         conversation_context: Optional conversation history
+        user_id: The ID of the authenticated user
+        auth_header: The raw Authorization header to pass to MCP tools
 
     Returns:
         Dict containing 'response', 'tool_calls', 'tool_responses'
     """
-    # Setup MCP server
-    mcp_params = MCPServerStreamableHttpParams(url=MCP_URL)
+    # Setup MCP server with headers if auth header is provided
+    if auth_header:
+        mcp_params = MCPServerStreamableHttpParams(
+            url=MCP_URL,
+            headers={"Authorization": auth_header}  # Forward the auth header
+        )
+    else:
+        mcp_params = MCPServerStreamableHttpParams(url=MCP_URL)
+
     async with MCPServerStreamableHttp(name="todo_tools", params=mcp_params) as server:
 
         # Create the agent
@@ -63,9 +74,12 @@ async def run_agent(
             model_settings=ModelSettings(tool_choice="auto")
         )
 
+        # Use the original config
+        run_config = config
+
         # Run the agent
-        result = await Runner.run(agent, input=user_input, run_config=config)
-        
+        result = await Runner.run(agent, input=user_input, run_config=run_config)
+
         # Structure the output
         final_result = {
             "response": result.final_output,
