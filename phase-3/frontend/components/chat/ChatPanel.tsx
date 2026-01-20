@@ -40,13 +40,41 @@ const ChatPanel = ({ isOpen, onClose }: ChatPanelProps) => {
 
   const loadConversations = async () => {
     try {
-      const response = await fetch('/api/conversations');
-      if (response.ok) {
-        const data = await response.json();
-        setConversations(data);
+      // Get the authentication token from localStorage
+      const token = localStorage.getItem('access_token') || localStorage.getItem('token');
+
+      const response = await fetch('/api/conversations', {
+        headers: {
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        }
+      });
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          // Clear any invalid tokens and redirect to login
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('token');
+
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+          }
+          throw new Error(`Authentication error: ${response.status}`);
+        } else {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
       }
-    } catch (error) {
+
+      const data = await response.json();
+      setConversations(data);
+    } catch (error: any) {
       console.error('Error loading conversations:', error);
+
+      if (error.message && (error.message.includes('401') || error.message.includes('Authentication error'))) {
+        // Redirect to login if unauthorized
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
+      }
     }
   };
 
