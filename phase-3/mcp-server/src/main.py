@@ -37,17 +37,8 @@ async def add_task(title: str, description: Optional[str] = None, ctx: Context =
     base_url = getattr(settings, "backend_api_url", "http://localhost:8000")
     endpoint = f"{base_url}/api/tasks"
 
-    # Extract auth header from context
+    # No authentication required for public tasks
     headers = {}
-    if ctx and hasattr(ctx, 'request') and hasattr(ctx.request, 'headers'):
-        auth_header = ctx.request.headers.get("authorization")
-        if auth_header:
-            # Ensure the header is in the correct format "Bearer <token>"
-            if auth_header.startswith("Bearer ") or auth_header.startswith("bearer "):
-                headers["Authorization"] = auth_header
-            else:
-                # If it's just the token, add the Bearer prefix
-                headers["Authorization"] = f"Bearer {auth_header}"
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
@@ -68,6 +59,7 @@ async def add_task(title: str, description: Optional[str] = None, ctx: Context =
             "details": await e.response.aread() if hasattr(e.response, "aread") else str(e)
         }
     except httpx.RequestError as e:
+        
         return {
             "error": "request_error",
             "message": f"Failed to connect to backend: {str(e)}",
@@ -106,17 +98,8 @@ async def list_tasks(status: Optional[str] = "all", ctx: Context = None) -> List
     if status != "all":
         endpoint += f"?status={status}"
 
-    # Extract auth header from context
+    # No authentication required for public tasks
     headers = {}
-    if ctx and hasattr(ctx, 'request') and hasattr(ctx.request, 'headers'):
-        auth_header = ctx.request.headers.get("authorization")
-        if auth_header:
-            # Ensure the header is in the correct format "Bearer <token>"
-            if auth_header.startswith("Bearer ") or auth_header.startswith("bearer "):
-                headers["Authorization"] = auth_header
-            else:
-                # If it's just the token, add the Bearer prefix
-                headers["Authorization"] = f"Bearer {auth_header}"
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
@@ -196,17 +179,8 @@ async def update_task(task_id: str, title: str | None = None, description: str |
     base_url = getattr(settings, "backend_api_url", "http://localhost:8000")
     endpoint = f"{base_url}/api/tasks/{task_id}"
 
-    # Extract auth header from context
+    # No authentication required for public tasks
     headers = {}
-    if ctx and hasattr(ctx, 'request') and hasattr(ctx.request, 'headers'):
-        auth_header = ctx.request.headers.get("authorization")
-        if auth_header:
-            # Ensure the header is in the correct format "Bearer <token>"
-            if auth_header.startswith("Bearer ") or auth_header.startswith("bearer "):
-                headers["Authorization"] = auth_header
-            else:
-                # If it's just the token, add the Bearer prefix
-                headers["Authorization"] = f"Bearer {auth_header}"
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
@@ -247,17 +221,8 @@ async def complete_task(task_id: str, ctx: Context = None) -> Dict[str, Any]:
     base_url = getattr(settings, "backend_api_url", "http://localhost:8000")
     endpoint = f"{base_url}/api/tasks/{task_id}/complete"
 
-    # Extract auth header from context
+    # No authentication required for public tasks
     headers = {}
-    if ctx and hasattr(ctx, 'request') and hasattr(ctx.request, 'headers'):
-        auth_header = ctx.request.headers.get("authorization")
-        if auth_header:
-            # Ensure the header is in the correct format "Bearer <token>"
-            if auth_header.startswith("Bearer ") or auth_header.startswith("bearer "):
-                headers["Authorization"] = auth_header
-            else:
-                # If it's just the token, add the Bearer prefix
-                headers["Authorization"] = f"Bearer {auth_header}"
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
@@ -298,18 +263,8 @@ async def delete_task(task_id: str, ctx: Context = None) -> Dict[str, Any]:
     base_url = getattr(settings, "backend_api_url", "http://localhost:8000")
     endpoint = f"{base_url}/api/tasks/{task_id}"
 
-    # Extract auth header from context
+    # No authentication required for public tasks
     headers = {}
-    if ctx and hasattr(ctx, 'request') and hasattr(ctx.request, 'headers'):
-        auth_header = ctx.request.headers.get("authorization")
-        if auth_header:
-            # Ensure the header is in the correct format "Bearer <token>"
-            if auth_header.startswith("Bearer ") or auth_header.startswith("bearer "):
-                headers["Authorization"] = auth_header
-            else:
-                # If it's just the token, add the Bearer prefix
-                headers["Authorization"] = f"Bearer {auth_header}"
-
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:

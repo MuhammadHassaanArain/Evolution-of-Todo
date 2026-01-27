@@ -146,23 +146,23 @@ class ApiClientWrapper {
 
   // Task methods - use the TypeScript client
   async getTasks(offset = 0, limit = 100) {
-    return await this.tsClient.get(`/tasks?offset=${offset}&limit=${limit}`);
+    return await this.tsClient.get(`/tasks?offset=${offset}&limit=${limit}`, { requiresAuth: false });
   }
 
   async createTask(taskData) {
-    return await this.tsClient.post('/tasks', taskData);
+    return await this.tsClient.post('/tasks', taskData, { requiresAuth: false });
   }
 
   async getTask(taskId) {
-    return await this.tsClient.get(`/tasks/${taskId}`);
+    return await this.tsClient.get(`/tasks/${taskId}`, { requiresAuth: false });
   }
 
   async updateTask(taskId, taskData) {
-    return await this.tsClient.put(`/tasks/${taskId}`, taskData);
+    return await this.tsClient.put(`/tasks/${taskId}`, taskData, { requiresAuth: false });
   }
 
   async deleteTask(taskId) {
-    return await this.tsClient.delete(`/tasks/${taskId}`);
+    return await this.tsClient.delete(`/tasks/${taskId}`, { requiresAuth: false });
   }
 }
 

@@ -75,7 +75,7 @@ from .base import TimestampMixin
 class Task(TaskBase, BaseUUIDModel, table=True):
     __tablename__ = "tasks"
 
-    user_id: int = Field(foreign_key="users.id", nullable=False)  # must match User.__tablename__
+    user_id: Optional[int] = Field(foreign_key="users.id", nullable=True)  # Optional user association for public tasks
 
     # Add timestamps directly to match the TaskRead schema expectations
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -95,7 +95,7 @@ class TaskUpdate(SQLModel):
 
 class TaskRead(TaskBase):
     id: str  # Will be converted from UUID to string
-    user_id: int
+    user_id: Optional[int]
     created_at: datetime
     updated_at: datetime
 
