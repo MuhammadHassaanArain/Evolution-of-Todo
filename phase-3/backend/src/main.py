@@ -48,10 +48,10 @@ def create_app() -> FastAPI:
         # Add security requirement to protected paths - use the JWT scheme name to match the dependency
         for path_name, path_item in openapi_schema.get("paths", {}).items():
             for method, operation in path_item.items():
-                if path_name.startswith(f"{settings.api_prefix}/tasks"):  # Protect task endpoints
+                if path_name.startswith(f"{settings.api_prefix}/auth/me"):  # Protect auth/me endpoint
                     if "security" not in operation:
                         operation["security"] = [{"JWT": []}]
-                elif path_name.startswith(f"{settings.api_prefix}/auth/me"):  # Protect auth/me endpoint
+                elif path_name.startswith(f"{settings.api_prefix}/chat"):  # Protect chat endpoints
                     if "security" not in operation:
                         operation["security"] = [{"JWT": []}]
 

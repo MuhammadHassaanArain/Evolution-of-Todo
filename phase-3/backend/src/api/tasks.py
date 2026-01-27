@@ -5,7 +5,6 @@ from ..database.session import get_session
 from ..models.task import Task, TaskCreate, TaskUpdate, TaskRead
 from ..models.user import UserRead
 from ..services.task_service import task_service
-from .auth_dependency import get_current_user
 from ..utils.logging import log_task_event
 from ..utils.validation import validate_payload_for_todos_create, validate_payload_for_todos_update
 from ..models.validation import PERMISSION_DENIED_ERROR, RESOURCE_NOT_FOUND_ERROR
@@ -19,18 +18,17 @@ router = APIRouter()
 def get_tasks(
     offset: int = 0,
     limit: int = 100,
-    current_user: UserRead = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
     """
-    Get all tasks for the current user
+    Get all public tasks
     """
     try:
-        tasks = task_service.list_tasks(session, current_user.id, offset=offset, limit=limit)
-        log_task_event("tasks_listed", user_id=current_user.id, success=True, details={"count": len(tasks)})
+        tasks = task_service.get_all_tasks(session, offset=offset, limit=limit)
+        log_task_event("all_tasks_listed", user_id=None, success=True, details={"count": len(tasks)})
         return [TaskRead.from_orm(task) for task in tasks]
     except Exception as e:
-        log_task_event("tasks_list_failed", user_id=current_user.id, success=False, details={"error": str(e)})
+        log_task_event("all_tasks_listed_failed", user_id=None, success=False, details={"error": str(e)})
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve tasks"
@@ -40,11 +38,10 @@ def get_tasks(
 @router.post("/tasks", response_model=TaskRead, status_code=status.HTTP_201_CREATED)
 def create_task(
     task: TaskCreate,
-    current_user: UserRead = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
     """
-    Create a new task for the current user with validation hardening
+    Create a new public task with validation hardening
     """
     try:
         # Convert the task to a dict for validation
@@ -53,14 +50,14 @@ def create_task(
         # Validate the payload for todo creation
         validate_payload_for_todos_create(task_dict)
 
-        db_task = task_service.create_task(session, task, current_user.id)
-        log_task_event("task_created", user_id=current_user.id, task_id=db_task.id, success=True)
+        db_task = task_service.create_task_public(session, task)
+        log_task_event("public_task_created", user_id=None, task_id=db_task.id, success=True)
         return TaskRead.from_orm(db_task)
     except HTTPException:
         # Re-raise HTTP exceptions (like validation errors)
         raise
     except Exception as e:
-        log_task_event("task_create_failed", user_id=current_user.id, success=False, details={"error": str(e)})
+        log_task_event("public_task_create_failed", user_id=None, success=False, details={"error": str(e)})
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create task"
@@ -70,28 +67,27 @@ def create_task(
 @router.get("/tasks/{task_id}", response_model=TaskRead)
 def get_task(
     task_id: str,
-    current_user: UserRead = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
     """
-    Get a specific task by ID for the current user with validation hardening
+    Get a specific task by ID with validation hardening
     """
     try:
-        db_task = task_service.get_task_by_id(session, task_id, current_user.id)
+        db_task = task_service.get_task_public(session, task_id)
         if not db_task:
-            log_task_event("task_access_denied", user_id=current_user.id, task_id=task_id, success=False, details={"reason": "task_not_found_or_not_owned"})
-            # Return 404 for non-owned resources (ownership enforcement)
+            log_task_event("task_not_found", user_id=None, task_id=task_id, success=False, details={"reason": "task_not_found"})
+            # Return 404 for non-existent resources
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=RESOURCE_NOT_FOUND_RESPONSE.dict()
             )
-        log_task_event("task_retrieved", user_id=current_user.id, task_id=task_id, success=True)
+        log_task_event("task_retrieved", user_id=None, task_id=task_id, success=True)
         return TaskRead.from_orm(db_task)
     except HTTPException:
         # Re-raise HTTP exceptions (like validation errors)
         raise
     except Exception as e:
-        log_task_event("task_retrieve_failed", user_id=current_user.id, task_id=task_id, success=False, details={"error": str(e)})
+        log_task_event("task_retrieve_failed", user_id=None, task_id=task_id, success=False, details={"error": str(e)})
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve task"
@@ -102,11 +98,10 @@ def get_task(
 def update_task(
     task_id: str,
     task_update: TaskUpdate,
-    current_user: UserRead = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
     """
-    Update a specific task for the current user with validation hardening
+    Update a specific task with validation hardening
     """
     try:
         # Convert the task_update to a dict for validation
@@ -115,21 +110,21 @@ def update_task(
         # Validate the payload for todo updates
         validate_payload_for_todos_update(task_update_dict)
 
-        db_task = task_service.update_task(session, task_id, task_update, current_user.id)
+        db_task = task_service.update_task_public(session, task_id, task_update)
         if not db_task:
-            log_task_event("task_update_failed", user_id=current_user.id, task_id=task_id, success=False, details={"reason": "task_not_found"})
-            # Return 404 for non-owned resources (ownership enforcement)
+            log_task_event("task_update_failed", user_id=None, task_id=task_id, success=False, details={"reason": "task_not_found"})
+            # Return 404 for non-existent resources
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=RESOURCE_NOT_FOUND_RESPONSE.dict()
             )
-        log_task_event("task_updated", user_id=current_user.id, task_id=task_id, success=True)
+        log_task_event("public_task_updated", user_id=None, task_id=task_id, success=True)
         return TaskRead.from_orm(db_task)
     except HTTPException:
         # Re-raise HTTP exceptions (like validation errors)
         raise
     except Exception as e:
-        log_task_event("task_update_failed", user_id=current_user.id, task_id=task_id, success=False, details={"error": str(e)})
+        log_task_event("public_task_update_failed", user_id=None, task_id=task_id, success=False, details={"error": str(e)})
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to update task"
@@ -139,18 +134,17 @@ def update_task(
 @router.patch("/tasks/{task_id}/complete", response_model=TaskRead)
 def complete_task(
     task_id: str,
-    current_user: UserRead = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
     """
-    Mark a specific task as completed for the current user
+    Mark a specific task as completed
     """
     try:
-        # Check if the task exists and belongs to the current user
-        db_task = task_service.get_task_by_id(session, task_id, current_user.id)
+        # Check if the task exists
+        db_task = task_service.get_task_public(session, task_id)
         if not db_task:
-            log_task_event("task_complete_failed", user_id=current_user.id, task_id=task_id, success=False, details={"reason": "task_not_found_or_not_owned"})
-            # Return 404 for non-owned resources (ownership enforcement)
+            log_task_event("task_complete_failed", user_id=None, task_id=task_id, success=False, details={"reason": "task_not_found"})
+            # Return 404 for non-existent resources
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=RESOURCE_NOT_FOUND_RESPONSE.dict()
@@ -158,26 +152,26 @@ def complete_task(
 
         # If already completed, return success (idempotent behavior)
         if db_task.is_completed:
-            log_task_event("task_already_completed", user_id=current_user.id, task_id=task_id, success=True)
+            log_task_event("task_already_completed", user_id=None, task_id=task_id, success=True)
             return TaskRead.from_orm(db_task)
 
         # Update the task to mark as completed
         task_update = TaskUpdate(is_completed=True)
-        updated_db_task = task_service.update_task(session, task_id, task_update, current_user.id)
+        updated_db_task = task_service.update_task_public(session, task_id, task_update)
         if not updated_db_task:
-            log_task_event("task_complete_failed", user_id=current_user.id, task_id=task_id, success=False, details={"reason": "task_not_found_after_validation"})
+            log_task_event("task_complete_failed", user_id=None, task_id=task_id, success=False, details={"reason": "task_not_found_after_validation"})
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=RESOURCE_NOT_FOUND_RESPONSE.dict()
             )
 
-        log_task_event("task_completed", user_id=current_user.id, task_id=task_id, success=True)
+        log_task_event("public_task_completed", user_id=None, task_id=task_id, success=True)
         return TaskRead.from_orm(updated_db_task)
     except HTTPException:
         # Re-raise HTTP exceptions (like validation errors)
         raise
     except Exception as e:
-        log_task_event("task_complete_failed", user_id=current_user.id, task_id=task_id, success=False, details={"error": str(e)})
+        log_task_event("public_task_complete_failed", user_id=None, task_id=task_id, success=False, details={"error": str(e)})
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to complete task"
@@ -187,28 +181,27 @@ def complete_task(
 @router.delete("/tasks/{task_id}")
 def delete_task(
     task_id: str,
-    current_user: UserRead = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
     """
-    Delete a specific task for the current user with validation hardening
+    Delete a specific task with validation hardening
     """
     try:
-        success = task_service.delete_task(session, task_id, current_user.id)
+        success = task_service.delete_task_public(session, task_id)
         if not success:
-            log_task_event("task_delete_failed", user_id=current_user.id, task_id=task_id, success=False, details={"reason": "task_not_found_or_not_owned"})
-            # Return 404 for non-owned resources (ownership enforcement)
+            log_task_event("task_delete_failed", user_id=None, task_id=task_id, success=False, details={"reason": "task_not_found"})
+            # Return 404 for non-existent resources
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=RESOURCE_NOT_FOUND_RESPONSE.dict()
             )
-        log_task_event("task_deleted", user_id=current_user.id, task_id=task_id, success=True)
+        log_task_event("public_task_deleted", user_id=None, task_id=task_id, success=True)
         return {"message": "Task deleted successfully"}
     except HTTPException:
         # Re-raise HTTP exceptions (like validation errors)
         raise
     except Exception as e:
-        log_task_event("task_delete_failed", user_id=current_user.id, task_id=task_id, success=False, details={"error": str(e)})
+        log_task_event("public_task_delete_failed", user_id=None, task_id=task_id, success=False, details={"error": str(e)})
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to delete task"

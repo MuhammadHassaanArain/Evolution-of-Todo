@@ -2,9 +2,9 @@
 Database migration script for the Todo application
 """
 from sqlmodel import SQLModel, create_engine
-from .config import settings
-from ..models.user import User
-from ..models.task import Task
+from src.config import settings
+from src.models.user import User
+from src.models.task import Task
 
 
 def create_db_and_tables():

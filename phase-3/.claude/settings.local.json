@@ -83,7 +83,13 @@
       "Bash(dir src)",
       "Bash(dir dependencies)",
       "Bash(find backend/src -name \"*.py\" -exec grep -l \"get_current_user\" {} ;)",
-      "Bash(timeout 10s uvicorn src.main:app --reload)"
+      "Bash(timeout 10s uvicorn src.main:app --reload)",
+      "Bash(python -c \"from src.main import create_app; app = create_app\\(\\); print\\(''App created successfully with all changes applied''\\)\")",
+      "Bash(python -c \"from src.main import create_app; app = create_app\\(\\); print\\(''App created successfully with updated task model''\\)\")",
+      "Bash(python -m py_compile src/models/task.py)",
+      "Bash(python -m py_compile src/main.py)",
+      "Bash(PYTHONPATH=. python -c \"\nimport sys\nimport os\nsys.path.insert\\(0, os.getcwd\\(\\)\\)\n\nfrom src.database.migrate import create_db_and_tables\ncreate_db_and_tables\\(\\)\nprint\\(''Database tables recreated with updated schema!''\\)\n\")",
+      "Bash(ls -la 'app/\\(auth\\)/signup/')"
     ]
   }
 }
