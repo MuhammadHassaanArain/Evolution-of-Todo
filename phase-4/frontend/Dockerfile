@@ -1,6 +1,6 @@
 # Use an official Node runtime as a parent image
-FROM node:18-alpine
 
+FROM node:20-alpine AS build
 # Set environment variables
 ENV NODE_ENV=production
 
