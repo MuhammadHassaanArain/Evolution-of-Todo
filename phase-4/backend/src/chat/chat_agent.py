@@ -55,7 +55,7 @@ async def run_agent(
     # This should make the headers available to the tools through the MCP protocol
     if auth_header:
         mcp_params = MCPServerStreamableHttpParams(
-            url="http:host.docker.internal:8001/mcp/",
+            url=MCP_URL,
             headers={"Authorization": auth_header}
         )
     else:
