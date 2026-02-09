@@ -1,0 +1,40 @@
+# Use Python 3.13 slim base image
+FROM python:3.13-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies (curl for health checks)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN useradd -m -u 1000 appuser
+
+# Copy pyproject.toml for dependency installation
+COPY pyproject.toml .
+
+# Install Python dependencies using pip
+# Note: FastMCP uses pyproject.toml, so we install from it
+RUN pip install --no-cache-dir .
+
+# Copy application code
+COPY --chown=appuser:appuser . .
+
+# Switch to non-root user
+USER appuser
+
+# Expose port
+EXPOSE 8001
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Health check (check if server is responding, 404 is acceptable)
+HEALTHCHECK --interval=10s --timeout=5s --start-period=20s --retries=5 \
+    CMD curl -s http://localhost:8001/ > /dev/null || exit 1
+
+# Start FastMCP application with uvicorn
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8001"]

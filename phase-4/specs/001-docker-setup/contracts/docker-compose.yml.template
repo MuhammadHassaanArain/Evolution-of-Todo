@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  # MCP Server - Starts first (no dependencies)
+  mcp-server:
+    build:
+      context: ./backend/mcp-server
+      dockerfile: Dockerfile
+    container_name: todo-mcp-server
+    ports:
+      - "8001:8001"
+    environment:
+      - BACKEND_API_URL=http://backend:8000
+      - MCP_SERVER_PORT=8001
+      - MCP_SERVER_HOST=0.0.0.0
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: on-failure
+    networks:
+      - todo-network
+
+  # Backend API - Depends on MCP Server
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: todo-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - MCP_SERVER_URL=http://mcp-server:8001/mcp/
+      - ALLOWED_ORIGINS=*
+    env_file:
+      - .env
+    depends_on:
+      mcp-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: on-failure
+    networks:
+      - todo-network
+    # Uncomment for development with hot-reload
+    # volumes:
+    #   - ./backend:/app
+    #   - /app/.venv
+
+  # Frontend - Depends on Backend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: todo-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+      - NODE_ENV=production
+    env_file:
+      - .env
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    restart: on-failure
+    networks:
+      - todo-network
+    # Uncomment for development with hot-reload
+    # volumes:
+    #   - ./frontend:/app
+    #   - /app/node_modules
+    #   - /app/.next
+
+networks:
+  todo-network:
+    name: todo-network
+    driver: bridge
